@@ -8,8 +8,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { MY_RESIDENTS_LIMIT } from "../domain/residents";
 import { residentsApi } from "../services/api/residents.api";
-import { withResidentColors } from "../utils/residentUtils";
-import type { Resident } from "../types/resident.types";
+import { withResidentColors, groupResidentsByRoom } from "../utils/residentUtils";
+import type { Resident, RoomGroup } from "../types/resident.types";
 
 export function useResidents(searchQuery?: string) {
   const {
@@ -37,13 +37,19 @@ export function useResidents(searchQuery?: string) {
   );
 
   const myResidents = useMemo(
-    () => residentsWithColors.slice(0, MY_RESIDENTS_LIMIT),
+    () => residentsWithColors.filter((r) => r.starred).slice(0, MY_RESIDENTS_LIMIT),
+    [residentsWithColors]
+  );
+
+  const roomGroups: RoomGroup[] = useMemo(
+    () => groupResidentsByRoom(residentsWithColors),
     [residentsWithColors]
   );
 
   return {
     residents: residentsWithColors,
     myResidents,
+    roomGroups,
     allResidents: residents,
     isLoading,
     isError,

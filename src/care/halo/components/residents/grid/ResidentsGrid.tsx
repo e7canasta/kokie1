@@ -8,8 +8,8 @@ export function ResidentsGrid(props: ResidentsGridProps) {
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: theme.spacing.sm,
-        padding: `0 ${theme.spacing.md} ${theme.spacing.md}`,
+        gap: "10px",
+        padding: `0 ${theme.spacing.md} 6px`,
       }}
     >
       {residents.map(props.renderItem)}

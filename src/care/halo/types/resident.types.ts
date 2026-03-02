@@ -25,17 +25,22 @@ export interface Resident {
   name: string;
   dob: string;
   room: string;
+  bed?: string;
   unit: string;
   age: number;
   wellness: Wellness;
   avatarGradient: string;
   image: string;
-  // Campos opcionales que vienen en el detalle
   wellnessData?: WellnessDataItem[];
   topCare?: TopCareItem[];
-  // Campos adicionales para UI
   colors?: string[];
   starred?: boolean;
+}
+
+export interface RoomGroup {
+  room: string;
+  unit: string;
+  residents: Resident[];
 }
 
 // Tipos para componentes

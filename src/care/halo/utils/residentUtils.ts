@@ -1,13 +1,11 @@
 /**
- * Resident utilities - color extraction and normalization for avatar gradients
+ * Resident utilities - color extraction, normalization, and room grouping
  */
+
+import type { Resident, RoomGroup } from "../types/resident.types";
 
 const DEFAULT_AVATAR_COLORS = ["#8B4A5E", "#A0586A", "#D4A0B0"];
 
-/**
- * Extract hex colors from a gradient string (e.g. "linear-gradient(135deg, #2E7D6F, #1B5E50)")
- * Returns [color1, color2, color2WithAlpha] for avatar use
- */
 export function extractColorsFromGradient(gradient: string): string[] {
   const matches = gradient.match(/#[0-9A-Fa-f]{6}/g);
   if (matches && matches.length >= 2) {
@@ -16,9 +14,6 @@ export function extractColorsFromGradient(gradient: string): string[] {
   return [...DEFAULT_AVATAR_COLORS];
 }
 
-/**
- * Ensure a resident has colors array from avatarGradient or default
- */
 export function withResidentColors<T extends { avatarGradient?: string; colors?: string[] }>(
   resident: T
 ): T & { colors: string[] } {
@@ -28,4 +23,23 @@ export function withResidentColors<T extends { avatarGradient?: string; colors?:
       ? extractColorsFromGradient(resident.avatarGradient)
       : resident.colors ?? DEFAULT_AVATAR_COLORS,
   };
+}
+
+/**
+ * Group residents by room number, preserving order of first appearance.
+ * Returns array of RoomGroup sorted by room number.
+ */
+export function groupResidentsByRoom(residents: Resident[]): RoomGroup[] {
+  const map = new Map<string, RoomGroup>();
+
+  for (const r of residents) {
+    const existing = map.get(r.room);
+    if (existing) {
+      existing.residents.push(r);
+    } else {
+      map.set(r.room, { room: r.room, unit: r.unit, residents: [r] });
+    }
+  }
+
+  return Array.from(map.values()).sort((a, b) => a.room.localeCompare(b.room));
 }

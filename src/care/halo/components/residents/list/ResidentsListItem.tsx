@@ -11,9 +11,11 @@ export function ResidentsListItem(props: ResidentsListItemProps) {
         style={{
           display: "flex",
           alignItems: "center",
-          padding: `${theme.spacing.sm} ${theme.spacing.md} ${theme.spacing.sm} 18px`,
+          padding: "14px 18px",
           gap: 0,
           cursor: "pointer",
+          minHeight: 56,
+          boxSizing: "border-box",
         }}
       >
         <div style={{ flex: 1 }}>
@@ -23,7 +25,7 @@ export function ResidentsListItem(props: ResidentsListItemProps) {
               fontWeight: theme.typography.fontWeight.bold,
               color: theme.colors.text.primary,
               display: "block",
-              lineHeight: 1.4,
+              lineHeight: theme.typography.lineHeight.tight,
             }}
           >
             {props.resident.name}
@@ -34,13 +36,19 @@ export function ResidentsListItem(props: ResidentsListItemProps) {
               color: theme.colors.text.secondary,
               fontWeight: theme.typography.fontWeight.medium,
               display: "block",
-              marginTop: 3,
+              marginTop: 4,
             }}
           >
             {props.resident.room}
           </span>
         </div>
-        <div style={{ flexShrink: 0, cursor: "pointer" }}>
+        <div
+          style={{
+            flexShrink: 0,
+            cursor: "pointer",
+            padding: theme.spacing.xs,
+          }}
+        >
           {props.resident.starred ? <StarFilledIcon /> : <StarOutline />}
         </div>
       </div>
@@ -49,7 +57,7 @@ export function ResidentsListItem(props: ResidentsListItemProps) {
           style={{
             height: 1,
             background: theme.colors.border.light,
-            margin: `0 18px`,
+            margin: "0 18px",
           }}
         />
       )}

@@ -1,8 +1,18 @@
+import { theme } from "../../../design-system";
+
 export function AllResidentsSectionTitle() {
-    return <>
-        {/* All Residents Section */}
-        <div style={{padding: "4px 18px 8px"}}>
-            <span style={{fontSize: 17, fontWeight: 700, color: "#1A1A1A", letterSpacing: "-0.01em"}}>All Residents</span>
-        </div>
-    </>;
+  return (
+    <div style={{ padding: `14px 18px 10px` }}>
+      <span
+        style={{
+          fontSize: theme.typography.fontSize.lg,
+          fontWeight: theme.typography.fontWeight.bold,
+          color: theme.colors.text.primary,
+          letterSpacing: theme.typography.letterSpacing.tight,
+        }}
+      >
+        All Residents
+      </span>
+    </div>
+  );
 }

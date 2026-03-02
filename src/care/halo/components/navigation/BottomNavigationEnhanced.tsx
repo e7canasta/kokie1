@@ -70,10 +70,10 @@ export function BottomNavigationEnhanced() {
         display: "flex",
         justifyContent: "space-around",
         alignItems: "flex-end",
-        padding: "0 6px 16px",
-        background: "linear-gradient(135deg, #1B5E50, #2A7568)",
+        padding: "0 6px 14px",
+        background: `linear-gradient(135deg, ${theme.colors.primary[600]}, ${theme.colors.primary[500]})`,
         flexShrink: 0,
-        height: 56,
+        height: 60,
         position: "relative",
         boxShadow: "0 -4px 20px rgba(0,0,0,0.1)",
       }}
@@ -94,21 +94,21 @@ export function BottomNavigationEnhanced() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: 1,
-              padding: "6px 6px 0",
-              color: isActive ? "#FFFFFF" : "rgba(255,255,255,0.45)",
-              minWidth: 48,
+              gap: 2,
+              padding: "6px 10px 0",
+              color: isActive ? theme.colors.text.inverse : "rgba(255,255,255,0.5)",
+              minWidth: 52,
               position: "relative",
               transform: isPressed ? "scale(0.9)" : "scale(1)",
-              transition: "all 0.15s ease-out",
+              transition: `all ${theme.transitions.fast}`,
             }}
           >
             {isActive && (
               <div
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
+                  width: 42,
+                  height: 42,
+                  borderRadius: theme.borderRadius.full,
                   background: "rgba(255,255,255,0.15)",
                   display: "flex",
                   alignItems: "center",
@@ -122,12 +122,15 @@ export function BottomNavigationEnhanced() {
               </div>
             )}
             {!isActive && <Icon active={isActive} />}
-            <div style={{ height: isActive ? 26 : 0, transition: "height 0.2s" }} />
+            <div style={{ height: isActive ? 28 : 0, transition: `height ${theme.transitions.normal}` }} />
             <span
               style={{
-                fontSize: 9,
-                fontWeight: isActive ? 600 : 400,
-                transition: "font-weight 0.2s",
+                fontSize: 11,
+                fontWeight: isActive
+                  ? theme.typography.fontWeight.semibold
+                  : theme.typography.fontWeight.normal,
+                transition: `font-weight ${theme.transitions.normal}`,
+                letterSpacing: theme.typography.letterSpacing.wide,
               }}
             >
               {item.label}
@@ -136,28 +139,28 @@ export function BottomNavigationEnhanced() {
         );
       })}
 
-      {/* FAB - Quick Action */}
+      {/* FAB */}
       <button
         onClick={() => {
           // TODO: Implementar acción rápida
           console.log("Quick action");
         }}
         style={{
-          background: "linear-gradient(135deg, #2B7A6B, #1F6B5E)",
+          background: `linear-gradient(135deg, ${theme.colors.primary[400]}, ${theme.colors.primary[600]})`,
           border: "3px solid rgba(255,255,255,0.2)",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 44,
-          height: 44,
-          borderRadius: "50%",
-          color: "white",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+          width: 48,
+          height: 48,
+          borderRadius: theme.borderRadius.full,
+          color: theme.colors.text.inverse,
+          boxShadow: theme.shadows.lg,
           padding: 0,
-          marginBottom: 4,
+          marginBottom: 2,
           transform: pressedButton === "fab" ? "scale(0.9)" : "scale(1)",
-          transition: "transform 0.15s ease-out",
+          transition: `transform ${theme.transitions.fast}`,
         }}
         onMouseDown={() => setPressedButton("fab")}
         onMouseUp={() => setPressedButton(null)}
