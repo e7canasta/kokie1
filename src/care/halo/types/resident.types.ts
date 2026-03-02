@@ -141,6 +141,9 @@ export interface CommandCenterProps {
   cvCoverage?: number; // 0-1 (percentage)
   nextRoom?: RoomGroup | null;
   onGoToNext?: () => void;
+  // Sprint 3 (P0) - Trending alerts
+  trendingDown?: number; // Residents trending down
+  critical?: number; // Critical declines (High → Low)
 }
 
 export interface CVStatusBadgeProps {

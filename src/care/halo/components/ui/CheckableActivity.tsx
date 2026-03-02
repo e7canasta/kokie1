@@ -7,6 +7,7 @@
 
 import { useState } from "react";
 import { theme } from "../../design-system/theme";
+import { haptics } from "../../utils/haptics";
 import type { TopCareItem } from "../../types/resident.types";
 
 export interface CheckableActivityProps {
@@ -18,6 +19,13 @@ export function CheckableActivity({ item, onToggle }: CheckableActivityProps): J
   const [isPressed, setIsPressed] = useState(false);
 
   const handleClick = () => {
+    // Haptic feedback: medium for completion, light for unchecking
+    if (!item.done) {
+      haptics.medium(); // Task completed
+    } else {
+      haptics.light(); // Task unchecked
+    }
+
     onToggle(item.title, !item.done);
   };
 

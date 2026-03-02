@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../../../../store";
 import { useResidents } from "../../hooks/useResidents";
 import { useRounding } from "../../context/RoundingContext";
+import { usePolling } from "../../hooks/usePolling";
 import { HotResidentsSlider } from "../../components/residents/HotResidentsSlider";
 import { RoomCard } from "../../components/residents/RoomCard";
-import { FloatingActionPill, type FabAction } from "../../components/navigation/FloatingActionPill";
+import { FloatingActionPill } from "../../components/navigation/FloatingActionPill";
 import { BottomNavigationEnhanced } from "../../components/navigation/BottomNavigationEnhanced";
 import { HomeIndicator } from "../../components/navigation/HomeIndicator";
 import { ScreenLayout } from "../../components/layout/ScreenLayout";
@@ -16,6 +17,8 @@ import { AnimateOnScroll } from "../../components/ui/AnimateOnScroll";
 import { CommandCenter } from "../../components/ui/CommandCenter";
 import { CVMetrics } from "../../components/ui/CVMetrics";
 import { BottomSheet } from "../../components/ui/BottomSheet";
+import { countTrendingResidents } from "../../utils/wellnessTrending";
+import { optimizeRoundingRoute } from "../../utils/roundingOptimization";
 import { theme } from "../../design-system";
 
 const CURRENT_UNIT = "2nd Floor · Memory Care & AL";
@@ -37,15 +40,22 @@ export default function ResidentsScreen() {
   const roomRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Sprint 1 (P0) - Rounding Flow
-  const { state: roundingState, startRounding, getRoundingProgress } = useRounding();
+  const { state: roundingState, startRounding } = useRounding();
   const [roundingSheetOpen, setRoundingSheetOpen] = useState(false);
+
+  // Sprint 3 (P0) - Real-time updates via polling (30s interval)
+  usePolling({
+    interval: 30000, // 30 segundos
+    queryKeys: [['residents']],
+    enabled: !isLoading, // Solo poll cuando ya cargó initial data
+  });
 
   const handleResidentClick = (id: number): void => {
     setSelectedResidentId(id);
     navigate(`/resident/${id}`);
   };
 
-  // Command Center data + CV Metrics (Sprint 3 P2)
+  // Command Center data + CV Metrics + Trending (Sprint 3 P0)
   const commandCenterData = useMemo(() => {
     const totalAlerts = residents.filter((r) => r.wellness?.trend === "Low").length;
     const overdueRooms = roomGroups.filter((g) => g.roundingStatus === "overdue").length;
@@ -58,9 +68,13 @@ export default function ResidentsScreen() {
     const roomsWithCV = roomGroups.filter((g) => g.cvStatus === "active").length;
     const cvCoverage = roomGroups.length > 0 ? roomsWithCV / roomGroups.length : 0;
 
-    // Sprint 3 (P2) - CV Metrics: confirmaciones ahorradas
+    // Sprint 2 (P0) - CV Metrics: confirmaciones ahorradas
     // Mock: rooms con CV ahorran ~4 confirmaciones/room por día
     const confirmationsSaved = roomsWithCV * 4;
+
+    // Sprint 3 (P0) - Trending alerts
+    const trendingCounts = countTrendingResidents(residents);
+    const { trendingDown, critical } = trendingCounts;
 
     // Next room: prioridad overdue con alerts, luego overdue, luego pending con alerts
     const nextRoom =
@@ -82,8 +96,18 @@ export default function ResidentsScreen() {
       roomsWithCV,
       totalRooms: roomGroups.length,
       confirmationsSaved,
+      trendingDown,
+      critical,
     };
   }, [residents, roomGroups]);
+
+  // Sprint 3 (P0) - Route optimization when rounding is active
+  const displayedRoomGroups = useMemo(() => {
+    if (roundingState.isActive) {
+      return optimizeRoundingRoute(roomGroups);
+    }
+    return roomGroups;
+  }, [roomGroups, roundingState.isActive]);
 
   const handleGoToNext = () => {
     if (commandCenterData.nextRoom) {
@@ -120,7 +144,7 @@ export default function ResidentsScreen() {
         <PullToRefresh onRefresh={async () => { await refetch(); }}>
           <div style={{ paddingBottom: theme.spacing.md, maxWidth: "100%" }}>
 
-            {/* Command Center — glance score */}
+            {/* Command Center — glance score + trending */}
             <div style={{ position: "sticky", top: 0, zIndex: 20 }}>
               <CommandCenter
                 alerts={commandCenterData.alerts}
@@ -129,6 +153,8 @@ export default function ResidentsScreen() {
                 cvCoverage={commandCenterData.cvCoverage}
                 nextRoom={commandCenterData.nextRoom}
                 onGoToNext={handleGoToNext}
+                trendingDown={commandCenterData.trendingDown}
+                critical={commandCenterData.critical}
               />
             </div>
 
@@ -194,7 +220,7 @@ export default function ResidentsScreen() {
             )}
 
             {/* Rooms */}
-            {roomGroups.length > 0 && (
+            {displayedRoomGroups.length > 0 && (
               <div style={{ padding: `4px ${theme.spacing.md} 0` }}>
                 {/* Rooms header — sticky below unit bar */}
                 <div
@@ -215,7 +241,7 @@ export default function ResidentsScreen() {
                       letterSpacing: theme.typography.letterSpacing.tight,
                     }}
                   >
-                    Rooms
+                    {roundingState.isActive ? 'Rounding Route' : 'Rooms'}
                   </span>
                   <span
                     style={{
@@ -224,12 +250,12 @@ export default function ResidentsScreen() {
                       color: theme.colors.text.tertiary,
                     }}
                   >
-                    {roomGroups.length} rooms
+                    {displayedRoomGroups.length} rooms
                   </span>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {roomGroups.map((group, i) => (
+                  {displayedRoomGroups.map((group, i) => (
                     <AnimateOnScroll key={group.room} delay={i * 60}>
                       <div ref={(el) => (roomRefs.current[group.room] = el)}>
                         <RoomCard

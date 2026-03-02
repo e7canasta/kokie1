@@ -48,7 +48,11 @@
       "
       onclick="
         if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen();
+          document.documentElement.requestFullscreen().then(function() {
+            if (screen.orientation && screen.orientation.lock) {
+              screen.orientation.lock('portrait').catch(function() {});
+            }
+          }).catch(function() {});
         } else {
           document.exitFullscreen();
         }

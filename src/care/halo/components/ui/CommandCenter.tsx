@@ -1,7 +1,9 @@
 /**
  * CommandCenter Component
  * Glance Score global - enfermera sabe el estado en < 1 segundo
- * Muestra: Alerts, Overdue, OK, CV Coverage, Next Room
+ * Muestra: Alerts, Overdue, OK, Trending, CV Coverage, Next Room
+ *
+ * Sprint 3 (P0): Trending alerts predictivas
  */
 
 import { theme } from "../../design-system";
@@ -14,9 +16,12 @@ export function CommandCenter({
   cvCoverage,
   nextRoom,
   onGoToNext,
+  trendingDown = 0,
+  critical = 0,
 }: CommandCenterProps) {
   const hasAlerts = alerts > 0;
   const hasOverdue = overdue > 0;
+  const hasTrending = trendingDown > 0 || critical > 0;
 
   return (
     <div
@@ -58,6 +63,33 @@ export function CommandCenter({
               }}
             >
               ALERT{alerts > 1 ? "S" : ""}
+            </span>
+          </div>
+        )}
+
+        {/* Trending Down (Sprint 3 P0) */}
+        {hasTrending && (
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span style={{ fontSize: 14, lineHeight: 1 }}>
+              {critical > 0 ? '🚨' : '📉'}
+            </span>
+            <span
+              style={{
+                fontSize: theme.typography.fontSize.sm,
+                fontWeight: theme.typography.fontWeight.bold,
+                color: critical > 0 ? '#B71C1C' : theme.colors.warning,
+              }}
+            >
+              {trendingDown + critical}
+            </span>
+            <span
+              style={{
+                fontSize: theme.typography.fontSize.xs,
+                fontWeight: theme.typography.fontWeight.medium,
+                color: theme.colors.text.secondary,
+              }}
+            >
+              TRENDING
             </span>
           </div>
         )}
