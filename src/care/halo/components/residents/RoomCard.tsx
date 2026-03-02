@@ -38,6 +38,7 @@ export function RoomCard({ group, onResidentClick }: RoomCardProps) {
   const severity = getRoomSeverity(group.residents);
   const hasAlert = severity === "alert";
   const [expanded, setExpanded] = useState(hasAlert);
+  const showScanIndicators = !expanded;
   const lowCount = group.residents.filter((r) => r.wellness?.trend === "Low").length;
   const isVisited = group.roundingStatus === "visited";
   const isOverdue = group.roundingStatus === "overdue";
@@ -80,43 +81,55 @@ export function RoomCard({ group, onResidentClick }: RoomCardProps) {
           {group.room}
         </span>
 
-        {/* Stacked mini avatars */}
-        <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
-          {group.residents.map((r, i) => (
-            <div
-              key={r.id}
-              style={{
-                marginLeft: i > 0 ? -7 : 0,
-                zIndex: group.residents.length - i,
-                position: "relative",
-                borderRadius: "50%",
-                border: `1.5px solid ${theme.colors.background.primary}`,
-              }}
-            >
-              <Avatar name={r.name} size={20} colors={r.colors ?? []} />
-            </div>
-          ))}
-        </div>
-
-        {/* Wellness dots */}
-        <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
-          {group.residents.map((r) => {
-            const trend = r.wellness?.trend ?? "Medium";
-            const color = WELLNESS_DOT[trend] ?? theme.colors.neutral[400];
-            return (
+        {/* Collapsed scan indicators (avatars + dots) hide on expand to reduce visual load on mobile */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            overflow: "hidden",
+            maxWidth: showScanIndicators ? 120 : 0,
+            opacity: showScanIndicators ? 1 : 0,
+            transform: showScanIndicators ? "translateX(0)" : "translateX(-4px)",
+            transition: "max-width 0.22s ease, opacity 0.18s ease, transform 0.22s ease",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+            {group.residents.map((r, i) => (
               <div
                 key={r.id}
                 style={{
-                  width: 6,
-                  height: 6,
+                  marginLeft: i > 0 ? -7 : 0,
+                  zIndex: group.residents.length - i,
+                  position: "relative",
                   borderRadius: "50%",
-                  background: color,
-                  boxShadow: trend === "Low" ? `0 0 5px ${color}90` : "none",
-                  animation: trend === "Low" ? "dotPulse 2s ease-in-out infinite" : "none",
+                  border: `1.5px solid ${theme.colors.background.primary}`,
                 }}
-              />
-            );
-          })}
+              >
+                <Avatar name={r.name} size={20} colors={r.colors ?? []} />
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
+            {group.residents.map((r) => {
+              const trend = r.wellness?.trend ?? "Medium";
+              const color = WELLNESS_DOT[trend] ?? theme.colors.neutral[400];
+              return (
+                <div
+                  key={r.id}
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: color,
+                    boxShadow: trend === "Low" ? `0 0 5px ${color}90` : "none",
+                    animation: trend === "Low" ? "dotPulse 2s ease-in-out infinite" : "none",
+                  }}
+                />
+              );
+            })}
+          </div>
         </div>
 
         <div style={{ flex: 1 }} />
@@ -166,17 +179,19 @@ export function RoomCard({ group, onResidentClick }: RoomCardProps) {
           </svg>
         )}
 
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: theme.typography.fontWeight.medium,
-            color: theme.colors.text.tertiary,
-            minWidth: 20,
-            textAlign: "right",
-          }}
-        >
-          {group.residents.length}/4
-        </span>
+        {!expanded && (
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: theme.typography.fontWeight.medium,
+              color: theme.colors.text.tertiary,
+              minWidth: 20,
+              textAlign: "right",
+            }}
+          >
+            {group.residents.length}/4
+          </span>
+        )}
 
         {/* Chevron */}
         <svg
