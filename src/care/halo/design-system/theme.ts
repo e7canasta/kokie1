@@ -140,6 +140,7 @@ export const theme = {
     modal: 1050,
     popover: 1060,
     tooltip: 1070,
+    toast: 1080,
   },
   
   breakpoints: {

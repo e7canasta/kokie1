@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useResidents } from "../../hooks/useResidents";
+import { useBulkConfirm } from "../../hooks/useActions";
 import { ScreenLayout } from "../../components/layout/ScreenLayout";
 import { LoadingState } from "../../components/ui/LoadingState";
 import { ErrorState } from "../../components/ui/ErrorState";
@@ -36,6 +37,9 @@ export default function RoomDetailScreen() {
   const [confirmPressed, setConfirmPressed] = useState(false);
   const [notePressed, setNotePressed] = useState(false);
 
+  // Sprint 2 (P0) - Bulk confirm mutation
+  const bulkConfirmMutation = useBulkConfirm();
+
   const roomGroup = roomGroups.find((g) => g.room === roomId);
 
   const handleBack = () => {
@@ -46,14 +50,17 @@ export default function RoomDetailScreen() {
     navigate(`/resident/${id}`);
   };
 
-  const handleConfirmAll = () => {
-    console.log("Confirm all visits for room", roomId);
-    // TODO: Implementar confirmación bulk
+  const handleConfirmAll = async () => {
+    if (!roomId) return;
+
+    await bulkConfirmMutation.mutateAsync(roomId);
+    // Opcional: auto-navigate back a ResidentsScreen después de confirm
+    // navigate("/");
   };
 
   const handleRoomNote = () => {
     console.log("Add room note for room", roomId);
-    // TODO: Implementar notas a nivel de room
+    // TODO Sprint 3: Implementar notas a nivel de room
   };
 
   if (isLoading) {
@@ -280,6 +287,7 @@ export default function RoomDetailScreen() {
             onMouseLeave={() => setConfirmPressed(false)}
             onTouchStart={() => setConfirmPressed(true)}
             onTouchEnd={() => setConfirmPressed(false)}
+            disabled={bulkConfirmMutation.isPending}
             style={{
               flex: 1,
               display: "flex",
@@ -293,9 +301,10 @@ export default function RoomDetailScreen() {
               color: theme.colors.text.inverse,
               fontSize: theme.typography.fontSize.sm,
               fontWeight: theme.typography.fontWeight.bold,
-              cursor: "pointer",
+              cursor: bulkConfirmMutation.isPending ? "not-allowed" : "pointer",
               transform: confirmPressed ? "scale(0.97)" : "scale(1)",
               transition: "transform 0.15s ease",
+              opacity: bulkConfirmMutation.isPending ? 0.7 : 1,
             }}
           >
             <svg
@@ -310,7 +319,7 @@ export default function RoomDetailScreen() {
             >
               <polyline points="20 6 9 17 4 12" />
             </svg>
-            CONFIRM ALL
+            {bulkConfirmMutation.isPending ? 'CONFIRMING...' : 'CONFIRM ALL'}
           </button>
         )}
 

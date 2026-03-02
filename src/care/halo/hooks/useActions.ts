@@ -84,3 +84,23 @@ export function useEscalateAlert() {
     },
   });
 }
+
+/**
+ * Hook para bulk confirm de room (todos los residents sin CV)
+ */
+export function useBulkConfirm() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (roomId: string) => actionsApi.confirmBulkVisit(roomId),
+    onSuccess: (data) => {
+      haptics.success(); // Success vibration para bulk confirm
+      queryClient.invalidateQueries({ queryKey: ['residents'] });
+      console.log('[Bulk Visit Confirmed]', data.message, `(${data.count} residents)`);
+    },
+    onError: (error: Error) => {
+      haptics.error();
+      console.error('[Bulk Confirm Error]', error.message);
+    },
+  });
+}

@@ -94,6 +94,32 @@ class ActionsApiService {
 
     return response.json();
   }
+
+  /**
+   * POST /api/visits/bulk - Confirmar visitas bulk para toda la room (sin CV)
+   */
+  async confirmBulkVisit(roomId: string): Promise<{
+    success: boolean;
+    visits: Visit[];
+    message: string;
+    count: number;
+  }> {
+    const response = await fetch(`${BASE_URL}/visits/bulk`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        roomId,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to confirm bulk visits');
+    }
+
+    return response.json();
+  }
 }
 
 export const actionsApi = new ActionsApiService();

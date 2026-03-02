@@ -1,23 +1,30 @@
 /**
  * CVMetrics Component
  *
- * Sprint 3 (P2) - CV Metrics Dashboard
+ * Sprint 2 (P0) - CV Metrics Dashboard
  * Shows Computer Vision adoption metrics to incentivize bottom-up adoption
+ *
+ * Bottom-up incentive strategy:
+ * - Muestra ahorro de tiempo tangible
+ * - Mensaje motivacional según cobertura
+ * - La enfermera ve el valor de CV → pide más cámaras
  */
 
 import { theme } from "../../design-system/theme";
+import { calculateCVCoverage, getCVMotivationalMessage } from "../../utils/cvDetection";
 
 export interface CVMetricsProps {
   roomsWithCV: number;
   totalRooms: number;
-  confirmationsSaved?: number; // Mock: confirmaciones ahorradas hoy
+  confirmationsSaved?: number; // Confirmaciones ahorradas hoy
 }
 
 export function CVMetrics({ roomsWithCV, totalRooms, confirmationsSaved = 0 }: CVMetricsProps): JSX.Element {
-  const cvPercentage = totalRooms > 0 ? Math.round((roomsWithCV / totalRooms) * 100) : 0;
+  const cvPercentage = calculateCVCoverage(roomsWithCV, totalRooms);
   const timeSavedMinutes = confirmationsSaved > 0 ? Math.ceil(confirmationsSaved * 0.5) : 0;
+  const motivationalMessage = getCVMotivationalMessage(cvPercentage);
 
-  if (confirmationsSaved === 0) return <></>;
+  if (confirmationsSaved === 0 && roomsWithCV === 0) return <></>;
 
   return (
     <div
@@ -123,6 +130,29 @@ export function CVMetrics({ roomsWithCV, totalRooms, confirmationsSaved = 0 }: C
             ({cvPercentage}%)
           </span>
         </div>
+      </div>
+
+      {/* Motivational Message */}
+      <div
+        style={{
+          marginTop: theme.spacing.sm,
+          padding: theme.spacing.sm,
+          background: `${theme.colors.primary[500]}10`,
+          borderRadius: theme.borderRadius.sm,
+          borderLeft: `3px solid ${theme.colors.primary[500]}`,
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontSize: theme.typography.fontSize.xs,
+            fontWeight: theme.typography.fontWeight.medium,
+            color: theme.colors.primary[700],
+            fontStyle: 'italic',
+          }}
+        >
+          💡 {motivationalMessage}
+        </p>
       </div>
     </div>
   );

@@ -447,6 +447,46 @@ app.get('/api/alerts', (req, res) => {
   res.json(alerts);
 });
 
+// Sprint 2 (P0) - Bulk confirm para rooms sin CV
+app.post('/api/visits/bulk', (req, res) => {
+  const { roomId, timestamp = new Date().toISOString() } = req.body;
+
+  if (!roomId) {
+    return res.status(400).json({ error: "Room ID is required" });
+  }
+
+  // Find all residents in room
+  const roomResidents = residents.filter(r => r.room === roomId);
+
+  if (roomResidents.length === 0) {
+    return res.status(404).json({ error: "Room not found or empty" });
+  }
+
+  // Create visits for all residents in room
+  const bulkVisits = roomResidents.map(resident => {
+    const visit = {
+      id: visits.length + 1,
+      residentId: resident.id,
+      residentName: resident.name,
+      room: resident.room,
+      bed: resident.bed,
+      timestamp,
+      type: 'manual-bulk', // bulk confirmation
+    };
+    visits.push(visit);
+    return visit;
+  });
+
+  console.log(`[POST] Bulk visit confirmed: Room ${roomId} (${bulkVisits.length} residents)`);
+
+  res.status(201).json({
+    success: true,
+    visits: bulkVisits,
+    message: `Bulk visit confirmed for Room ${roomId}`,
+    count: bulkVisits.length
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Mock API server running at http://localhost:${PORT}`);
 });
