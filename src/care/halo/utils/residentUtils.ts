@@ -78,3 +78,27 @@ export function groupResidentsByRoom(residents: Resident[]): RoomGroup[] {
 
   return groups.sort((a, b) => a.room.localeCompare(b.room));
 }
+
+/**
+ * Get "Hot Residents" - generative/contextual list of residents needing attention
+ * Sorted by triage priority (highest urgency first)
+ *
+ * Sprint 2 (P1) feature - NOT static favorites, but dynamic based on:
+ * - Alert status (Low wellness)
+ * - Next in rounding sequence
+ * - Recent wellness changes
+ * - Assigned priority
+ *
+ * @param residents - All residents
+ * @returns Sorted array of residents by triageScore (descending)
+ */
+export function getHotResidents(residents: Resident[]): Resident[] {
+  return residents
+    .filter((r) => r.triageScore !== undefined && r.triageScore > 0)
+    .sort((a, b) => {
+      // Sort by triageScore descending (higher score = higher priority)
+      const scoreA = a.triageScore ?? 0;
+      const scoreB = b.triageScore ?? 0;
+      return scoreB - scoreA;
+    });
+}

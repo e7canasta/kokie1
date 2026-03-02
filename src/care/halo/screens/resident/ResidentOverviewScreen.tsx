@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useResident } from "../../hooks/useResident";
+import { useResidentNavigation } from "../../hooks/useResidentNavigation";
+import { useSwipeGesture } from "../../hooks/useSwipeGesture";
 import { ResidentHeader } from "./ResidentHeader";
 import { ViewRoomButton } from "./ViewRoomButton";
 import { WellnessCard } from "../../components/residents/WellnessCard/WellnessCard";
@@ -8,10 +10,22 @@ import { ScreenLayout } from "../../components/layout/ScreenLayout";
 import { LoadingState } from "../../components/ui/LoadingState";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { QuickActionBar } from "../../components/ui/QuickActionBar";
+import { theme } from "../../design-system";
 
 export default function ResidentOverviewScreen() {
     const navigate = useNavigate();
     const { resident, isLoading, isError, error, refetch } = useResident();
+
+    // Sprint 2 (P1) - Swipe navigation between residents
+    const navigation = resident ? useResidentNavigation(resident.id) : null;
+
+    // Swipe gesture handlers
+    const { ref: swipeRef } = useSwipeGesture({
+        onSwipeLeft: () => navigation?.goToNext(),
+        onSwipeRight: () => navigation?.goToPrev(),
+        threshold: 50,
+        velocity: 0.3,
+    });
 
     const handleBack = (): void => {
         navigate("/");
@@ -61,6 +75,7 @@ export default function ResidentOverviewScreen() {
     return (
         <ScreenLayout background="#FFFFFF">
             <div
+                ref={swipeRef}
                 style={{
                     flex: 1,
                     display: "flex",
@@ -71,6 +86,59 @@ export default function ResidentOverviewScreen() {
                 <div style={{ height: 10 }} />
 
                 <ResidentHeader resident={resident} onBack={handleBack} />
+
+                {/* Navigation Indicator (Sprint 2 P1) */}
+                {navigation && navigation.totalResidents > 1 && (
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 8,
+                            padding: "8px 20px 12px",
+                        }}
+                    >
+                        <button
+                            onClick={navigation.goToPrev}
+                            disabled={!navigation.hasPrev}
+                            style={{
+                                background: "none",
+                                border: "none",
+                                color: navigation.hasPrev ? theme.colors.primary[500] : theme.colors.neutral[300],
+                                fontSize: 20,
+                                cursor: navigation.hasPrev ? "pointer" : "not-allowed",
+                                padding: 4,
+                                opacity: navigation.hasPrev ? 1 : 0.4,
+                            }}
+                        >
+                            ←
+                        </button>
+                        <span
+                            style={{
+                                fontSize: theme.typography.fontSize.sm,
+                                fontWeight: theme.typography.fontWeight.medium,
+                                color: theme.colors.text.secondary,
+                            }}
+                        >
+                            {navigation.navigationLabel}
+                        </span>
+                        <button
+                            onClick={navigation.goToNext}
+                            disabled={!navigation.hasNext}
+                            style={{
+                                background: "none",
+                                border: "none",
+                                color: navigation.hasNext ? theme.colors.primary[500] : theme.colors.neutral[300],
+                                fontSize: 20,
+                                cursor: navigation.hasNext ? "pointer" : "not-allowed",
+                                padding: 4,
+                                opacity: navigation.hasNext ? 1 : 0.4,
+                            }}
+                        >
+                            →
+                        </button>
+                    </div>
+                )}
 
                 <div style={{ padding: "8px 20px 16px" }}>
                     <ViewRoomButton onClick={handleViewRoom} />

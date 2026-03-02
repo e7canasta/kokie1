@@ -23,6 +23,8 @@ const residents = [
     starred: true,
     hasCV: true,
     lastCVDetection: 5,
+    triageScore: 55,
+    triageReason: "recent-change", // Cambió de Low a Medium
   },
   {
     id: 2,
@@ -38,6 +40,8 @@ const residents = [
     starred: true,
     hasCV: true,
     lastCVDetection: 5,
+    triageScore: 95,
+    triageReason: "alert", // Low wellness + bajó de High
   },
   {
     id: 3,
@@ -53,6 +57,8 @@ const residents = [
     starred: false,
     hasCV: true,
     lastCVDetection: 5,
+    triageScore: 20,
+    triageReason: "assigned", // Estable, sin cambios
   },
   {
     id: 4,
@@ -68,6 +74,8 @@ const residents = [
     starred: false,
     hasCV: true,
     lastCVDetection: 5,
+    triageScore: 25,
+    triageReason: "assigned", // Estable
   },
   // ── Room 202 · Memory Care (4 beds) — SIN CV ──
   {
@@ -83,6 +91,8 @@ const residents = [
     image: "https://i.pravatar.cc/150?img=3",
     starred: true,
     hasCV: false,
+    triageScore: 60,
+    triageReason: "next-in-round", // Starred = siguiente en ronda
   },
   {
     id: 6,
@@ -97,6 +107,8 @@ const residents = [
     image: "https://i.pravatar.cc/150?img=4",
     starred: true,
     hasCV: false,
+    triageScore: 65,
+    triageReason: "next-in-round", // Starred = siguiente en ronda
   },
   {
     id: 7,
@@ -111,6 +123,8 @@ const residents = [
     image: "https://i.pravatar.cc/150?img=5",
     starred: false,
     hasCV: false,
+    triageScore: 90,
+    triageReason: "alert", // Low wellness persistente
   },
   {
     id: 8,
@@ -125,6 +139,8 @@ const residents = [
     image: "https://i.pravatar.cc/150?img=6",
     starred: false,
     hasCV: false,
+    triageScore: 50,
+    triageReason: "recent-change", // Mejoró de Low a Medium
   },
   // ── Room 203 · Assisted Living (4 beds) — CON CV ──
   {
@@ -141,6 +157,8 @@ const residents = [
     starred: false,
     hasCV: true,
     lastCVDetection: 12,
+    triageScore: 15,
+    triageReason: "assigned", // Estable, sin cambios
   },
   {
     id: 10,
@@ -156,6 +174,8 @@ const residents = [
     starred: false,
     hasCV: true,
     lastCVDetection: 12,
+    triageScore: 85,
+    triageReason: "alert", // Bajó a Low wellness
   },
   {
     id: 11,
@@ -171,6 +191,8 @@ const residents = [
     starred: false,
     hasCV: true,
     lastCVDetection: 12,
+    triageScore: 45,
+    triageReason: "recent-change", // Mejoró de Medium a High
   },
   {
     id: 12,
@@ -186,6 +208,8 @@ const residents = [
     starred: false,
     hasCV: true,
     lastCVDetection: 12,
+    triageScore: 50,
+    triageReason: "recent-change", // Bajó de High a Medium
   },
   // ── Room 204 · Assisted Living (4 beds) — SIN CV ──
   {
@@ -201,6 +225,8 @@ const residents = [
     image: "https://i.pravatar.cc/150?img=13",
     starred: false,
     hasCV: false,
+    triageScore: 48,
+    triageReason: "recent-change", // Bajó de High a Medium
   },
   {
     id: 14,
@@ -215,6 +241,8 @@ const residents = [
     image: "https://i.pravatar.cc/150?img=14",
     starred: false,
     hasCV: false,
+    triageScore: 88,
+    triageReason: "alert", // Low wellness persistente
   },
   {
     id: 15,
@@ -229,6 +257,8 @@ const residents = [
     image: "https://i.pravatar.cc/150?img=15",
     starred: false,
     hasCV: false,
+    triageScore: 18,
+    triageReason: "assigned", // Estable, sin cambios
   },
   {
     id: 16,
@@ -243,6 +273,8 @@ const residents = [
     image: "https://i.pravatar.cc/150?img=16",
     starred: false,
     hasCV: false,
+    triageScore: 80,
+    triageReason: "alert", // Bajó a Low wellness
   },
 ];
 
