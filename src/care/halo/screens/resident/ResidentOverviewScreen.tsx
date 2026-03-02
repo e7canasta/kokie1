@@ -4,6 +4,7 @@ import { useResident } from "../../hooks/useResident";
 import { useResidentNavigation } from "../../hooks/useResidentNavigation";
 import { useSwipeGesture } from "../../hooks/useSwipeGesture";
 import { useConfirmVisit, useAddNote, useEscalateAlert } from "../../hooks/useActions";
+import { useToggleFavorite } from "../../hooks/useToggleFavorite";
 import { ResidentHeader } from "./ResidentHeader";
 import { ViewRoomButton } from "./ViewRoomButton";
 import { WellnessCard } from "../../components/residents/WellnessCard/WellnessCard";
@@ -29,9 +30,10 @@ export default function ResidentOverviewScreen() {
     const confirmVisitMutation = useConfirmVisit();
     const addNoteMutation = useAddNote();
     const escalateAlertMutation = useEscalateAlert();
+    const { toggleFavorite } = useToggleFavorite();
 
-    // Sprint 2 (P1) - Swipe navigation between residents
-    const navigation = resident ? useResidentNavigation(resident.id) : null;
+    // Sprint 2 (P1) - Swipe navigation between residents (always call hook — never conditionally)
+    const navigation = useResidentNavigation(resident?.id ?? -1);
 
     // Swipe gesture handlers
     const { ref: swipeRef } = useSwipeGesture({
@@ -123,10 +125,14 @@ export default function ResidentOverviewScreen() {
             >
                 <div style={{ height: 10 }} />
 
-                <ResidentHeader resident={resident} onBack={handleBack} />
+                <ResidentHeader
+                    resident={resident}
+                    onBack={handleBack}
+                    onToggleFavorite={toggleFavorite}
+                  />
 
                 {/* Navigation Indicator (Sprint 2 P1) */}
-                {navigation && navigation.totalResidents > 1 && (
+                {navigation.totalResidents > 1 && (
                     <div
                         style={{
                             display: "flex",

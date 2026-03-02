@@ -1,9 +1,10 @@
 import { theme } from "../../design-system";
 import { ChevronLeftIcon } from "../../icons/ChevronLeftIcon";
-import { StarIcon } from "../../icons/StarIcon";
+import { StarFilledIcon } from "../../icons/StarFilledIcon";
+import { StarOutline } from "../../icons/StarOutlineIcon";
 import type { ResidentHeaderProps } from "../../types/resident.types";
 
-export function ResidentHeader({ resident, onBack }: ResidentHeaderProps) {
+export function ResidentHeader({ resident, onBack, onToggleFavorite }: ResidentHeaderProps) {
   return (
     <div
       style={{
@@ -68,7 +69,26 @@ export function ResidentHeader({ resident, onBack }: ResidentHeaderProps) {
       </div>
 
       <div style={{ flexShrink: 0, paddingTop: 2 }}>
-        <StarIcon />
+        {onToggleFavorite ? (
+          <button
+            type="button"
+            onClick={() => onToggleFavorite(resident.id)}
+            aria-label={resident.starred ? "Quitar de favoritos" : "Añadir a favoritos"}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: theme.spacing.xs,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {resident.starred ? <StarFilledIcon /> : <StarOutline />}
+          </button>
+        ) : (
+          resident.starred ? <StarFilledIcon /> : <StarOutline />
+        )}
       </div>
     </div>
   );

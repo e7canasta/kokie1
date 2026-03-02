@@ -45,9 +45,18 @@ export function ResidentsListItem(props: ResidentsListItemProps) {
         <div
           style={{
             flexShrink: 0,
-            cursor: "pointer",
             padding: theme.spacing.xs,
+            ...(props.onToggleFavorite ? { cursor: "pointer" } : {}),
           }}
+          onClick={(e) => {
+            if (props.onToggleFavorite) {
+              e.preventDefault();
+              e.stopPropagation();
+              props.onToggleFavorite(props.resident.id);
+            }
+          }}
+          role={props.onToggleFavorite ? "button" : undefined}
+          aria-label={props.onToggleFavorite ? (props.resident.starred ? "Quitar de favoritos" : "Añadir a favoritos") : undefined}
         >
           {props.resident.starred ? <StarFilledIcon /> : <StarOutline />}
         </div>

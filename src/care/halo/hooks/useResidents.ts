@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { MY_RESIDENTS_LIMIT } from "../domain/residents";
 import { residentsApi } from "../services/api/residents.api";
+import { getStarredIdsFromStorage } from "../utils/favorites";
 import { withResidentColors, groupResidentsByRoom, getHotResidents } from "../utils/residentUtils";
 import type { Resident, RoomGroup } from "../types/resident.types";
 
@@ -32,9 +33,18 @@ export function useResidents(searchQuery?: string) {
     return residents.filter((r) => r.name.toLowerCase().includes(query));
   }, [residents, searchQuery]);
 
+  // Fusionar favoritos guardados en localStorage (persisten al recargar)
+  const residentsWithStarred = useMemo(() => {
+    const starredIds = getStarredIdsFromStorage();
+    return filteredResidents.map((r) => ({
+      ...r,
+      starred: starredIds.has(r.id) ?? r.starred,
+    }));
+  }, [filteredResidents]);
+
   const residentsWithColors = useMemo(
-    () => filteredResidents.map((r) => withResidentColors(r) as Resident),
-    [filteredResidents]
+    () => residentsWithStarred.map((r) => withResidentColors(r) as Resident),
+    [residentsWithStarred]
   );
 
   const myResidents = useMemo(

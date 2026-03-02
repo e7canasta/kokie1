@@ -72,6 +72,8 @@ export interface ResidentsListItemProps {
   resident: Resident;
   i: number;
   totalResidents: number;
+  /** Si se pasa, la estrella es clicable para marcar/desmarcar favorito */
+  onToggleFavorite?: (residentId: number) => void;
 }
 
 export interface ResidentsListProps {
@@ -82,6 +84,8 @@ export interface ResidentsListProps {
 export interface ResidentHeaderProps {
   resident: Resident;
   onBack: () => void;
+  /** Si se pasa, la estrella es clicable para marcar/desmarcar favorito */
+  onToggleFavorite?: (residentId: number) => void;
 }
 
 export interface WellnessCardData {
