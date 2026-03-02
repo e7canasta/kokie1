@@ -54,6 +54,12 @@ export const ResidentSchema = z.object({
   topCare: z.array(TopCareItemSchema).optional(),
   colors: z.array(z.string()).optional(),
   starred: z.boolean().optional(),
+  // Computer Vision
+  hasCV: z.boolean().optional(),
+  lastCVDetection: z.number().optional(),
+  // Triage Assistant
+  triageScore: z.number().min(0).max(100).optional(),
+  triageReason: z.enum(["alert", "next-in-round", "recent-change", "assigned"]).optional(),
 });
 
 /**

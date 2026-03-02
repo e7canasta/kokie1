@@ -11,7 +11,9 @@ import { LoadingState } from "../../components/ui/LoadingState";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { PullToRefresh } from "../../components/ui/PullToRefresh";
 import { AnimateOnScroll } from "../../components/ui/AnimateOnScroll";
+import { CommandCenter } from "../../components/ui/CommandCenter";
 import { theme } from "../../design-system";
+import { useMemo, useRef } from "react";
 
 const CURRENT_UNIT = "2nd Floor · Memory Care & AL";
 
@@ -29,11 +31,53 @@ export default function ResidentsScreen() {
 
   const { residents, myResidents, roomGroups, isLoading, isError, error, refetch } = useResidents();
   const setSelectedResidentId = useAppStore((s) => s.setSelectedResidentId);
-  const totalAlerts = residents.filter((r) => r.wellness?.trend === "Low").length;
+  const roomRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const handleResidentClick = (id: number): void => {
     setSelectedResidentId(id);
     navigate(`/resident/${id}`);
+  };
+
+  // Command Center data
+  const commandCenterData = useMemo(() => {
+    const totalAlerts = residents.filter((r) => r.wellness?.trend === "Low").length;
+    const overdueRooms = roomGroups.filter((g) => g.roundingStatus === "overdue").length;
+    const okRooms = roomGroups.filter((g) => {
+      const hasAlert = g.residents.some((r) => r.wellness?.trend === "Low");
+      return !hasAlert && (g.roundingStatus === "visited" || g.roundingStatus === "pending");
+    }).length;
+
+    // CV coverage (mock - en producción vendría del backend)
+    const roomsWithCV = roomGroups.filter((g) => g.cvStatus === "active").length;
+    const cvCoverage = roomGroups.length > 0 ? roomsWithCV / roomGroups.length : 0;
+
+    // Next room: prioridad overdue con alerts, luego overdue, luego pending con alerts
+    const nextRoom =
+      roomGroups.find(
+        (g) => g.roundingStatus === "overdue" && g.residents.some((r) => r.wellness?.trend === "Low")
+      ) ||
+      roomGroups.find((g) => g.roundingStatus === "overdue") ||
+      roomGroups.find(
+        (g) => g.roundingStatus === "pending" && g.residents.some((r) => r.wellness?.trend === "Low")
+      ) ||
+      null;
+
+    return {
+      alerts: totalAlerts,
+      overdue: overdueRooms,
+      ok: okRooms,
+      cvCoverage,
+      nextRoom,
+    };
+  }, [residents, roomGroups]);
+
+  const handleGoToNext = () => {
+    if (commandCenterData.nextRoom) {
+      const roomElement = roomRefs.current[commandCenterData.nextRoom.room];
+      if (roomElement) {
+        roomElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
   };
 
   if (isLoading) {
@@ -62,69 +106,36 @@ export default function ResidentsScreen() {
         <PullToRefresh onRefresh={async () => { await refetch(); }}>
           <div style={{ paddingBottom: theme.spacing.md, maxWidth: "100%" }}>
 
-            {/* Unit/Floor context bar — sticky */}
+            {/* Command Center — glance score */}
+            <div style={{ position: "sticky", top: 0, zIndex: 20 }}>
+              <CommandCenter
+                alerts={commandCenterData.alerts}
+                overdue={commandCenterData.overdue}
+                ok={commandCenterData.ok}
+                cvCoverage={commandCenterData.cvCoverage}
+                nextRoom={commandCenterData.nextRoom}
+                onGoToNext={handleGoToNext}
+              />
+            </div>
+
+            {/* Unit context (simplified) */}
             <div
               style={{
-                ...stickyBar,
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
-                padding: "10px 18px 8px",
-                borderBottom: `1px solid transparent`,
-                transition: "border-color 0.2s ease",
+                padding: "8px 18px 6px",
+                background: theme.colors.background.secondary,
               }}
             >
-              <button
+              <span
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: 0,
+                  fontSize: theme.typography.fontSize.md,
+                  fontWeight: theme.typography.fontWeight.semibold,
+                  color: theme.colors.text.primary,
                 }}
               >
-                <span
-                  style={{
-                    fontSize: theme.typography.fontSize.xl,
-                    fontWeight: theme.typography.fontWeight.bold,
-                    color: theme.colors.text.primary,
-                    letterSpacing: theme.typography.letterSpacing.tight,
-                  }}
-                >
-                  {CURRENT_UNIT}
-                </span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.colors.text.tertiary} strokeWidth="2.5" strokeLinecap="round">
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span
-                  style={{
-                    fontSize: theme.typography.fontSize.xs,
-                    fontWeight: theme.typography.fontWeight.semibold,
-                    color: theme.colors.text.tertiary,
-                  }}
-                >
-                  {residents.length}
-                </span>
-                {totalAlerts > 0 && (
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: theme.typography.fontWeight.bold,
-                      color: theme.colors.text.inverse,
-                      background: theme.colors.error,
-                      borderRadius: theme.borderRadius.full,
-                      padding: "2px 7px",
-                      lineHeight: "1.4",
-                    }}
-                  >
-                    {totalAlerts}
-                  </span>
-                )}
-              </div>
+                {CURRENT_UNIT}
+              </span>
             </div>
 
             {/* My Residents */}
@@ -189,10 +200,12 @@ export default function ResidentsScreen() {
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {roomGroups.map((group, i) => (
                     <AnimateOnScroll key={group.room} delay={i * 60}>
-                      <RoomCard
-                        group={group}
-                        onResidentClick={handleResidentClick}
-                      />
+                      <div ref={(el) => (roomRefs.current[group.room] = el)}>
+                        <RoomCard
+                          group={group}
+                          onResidentClick={handleResidentClick}
+                        />
+                      </div>
                     </AnimateOnScroll>
                   ))}
                 </div>

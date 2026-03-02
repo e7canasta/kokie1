@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 const residents = [
-  // ── Room 201 · Memory Care (4 beds) ──
+  // ── Room 201 · Memory Care (4 beds) — CON CV ──
   {
     id: 1,
     name: "Margaret Chen",
@@ -21,6 +21,8 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #2E7D6F, #1B5E50)",
     image: "https://i.pravatar.cc/150?img=1",
     starred: true,
+    hasCV: true,
+    lastCVDetection: 5,
   },
   {
     id: 2,
@@ -34,6 +36,8 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #5C6BC0, #3F51B5)",
     image: "https://i.pravatar.cc/150?img=2",
     starred: true,
+    hasCV: true,
+    lastCVDetection: 5,
   },
   {
     id: 3,
@@ -47,6 +51,8 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #AB47BC, #7B1FA2)",
     image: "https://i.pravatar.cc/150?img=9",
     starred: false,
+    hasCV: true,
+    lastCVDetection: 5,
   },
   {
     id: 4,
@@ -60,8 +66,10 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #EF5350, #C62828)",
     image: "https://i.pravatar.cc/150?img=10",
     starred: false,
+    hasCV: true,
+    lastCVDetection: 5,
   },
-  // ── Room 202 · Memory Care (4 beds) ──
+  // ── Room 202 · Memory Care (4 beds) — SIN CV ──
   {
     id: 5,
     name: "Dorothy Martinez",
@@ -74,6 +82,7 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #66BB6A, #388E3C)",
     image: "https://i.pravatar.cc/150?img=3",
     starred: true,
+    hasCV: false,
   },
   {
     id: 6,
@@ -87,6 +96,7 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #FFA726, #F57C00)",
     image: "https://i.pravatar.cc/150?img=4",
     starred: true,
+    hasCV: false,
   },
   {
     id: 7,
@@ -100,6 +110,7 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #8D6E63, #5D4037)",
     image: "https://i.pravatar.cc/150?img=5",
     starred: false,
+    hasCV: false,
   },
   {
     id: 8,
@@ -113,8 +124,9 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #42A5F5, #1565C0)",
     image: "https://i.pravatar.cc/150?img=6",
     starred: false,
+    hasCV: false,
   },
-  // ── Room 203 · Assisted Living (4 beds) ──
+  // ── Room 203 · Assisted Living (4 beds) — CON CV ──
   {
     id: 9,
     name: "Susan Clark",
@@ -127,6 +139,8 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #EC407A, #AD1457)",
     image: "https://i.pravatar.cc/150?img=7",
     starred: false,
+    hasCV: true,
+    lastCVDetection: 12,
   },
   {
     id: 10,
@@ -140,6 +154,8 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #78909C, #455A64)",
     image: "https://i.pravatar.cc/150?img=8",
     starred: false,
+    hasCV: true,
+    lastCVDetection: 12,
   },
   {
     id: 11,
@@ -153,6 +169,8 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #26A69A, #00796B)",
     image: "https://i.pravatar.cc/150?img=11",
     starred: false,
+    hasCV: true,
+    lastCVDetection: 12,
   },
   {
     id: 12,
@@ -166,8 +184,10 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #7E57C2, #4527A0)",
     image: "https://i.pravatar.cc/150?img=12",
     starred: false,
+    hasCV: true,
+    lastCVDetection: 12,
   },
-  // ── Room 204 · Assisted Living (4 beds) ──
+  // ── Room 204 · Assisted Living (4 beds) — SIN CV ──
   {
     id: 13,
     name: "Elizabeth Turner",
@@ -180,6 +200,7 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #FF7043, #D84315)",
     image: "https://i.pravatar.cc/150?img=13",
     starred: false,
+    hasCV: false,
   },
   {
     id: 14,
@@ -193,6 +214,7 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #5C6BC0, #283593)",
     image: "https://i.pravatar.cc/150?img=14",
     starred: false,
+    hasCV: false,
   },
   {
     id: 15,
@@ -206,6 +228,7 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #4DB6AC, #00796B)",
     image: "https://i.pravatar.cc/150?img=15",
     starred: false,
+    hasCV: false,
   },
   {
     id: 16,
@@ -219,6 +242,7 @@ const residents = [
     avatarGradient: "linear-gradient(135deg, #A1887F, #6D4C41)",
     image: "https://i.pravatar.cc/150?img=16",
     starred: false,
+    hasCV: false,
   },
 ];
 

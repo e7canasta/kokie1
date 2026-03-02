@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { theme } from "../../design-system";
 import { Avatar } from "../ui/Avatar";
 import type { Resident, RoomGroup } from "../../types/resident.types";
@@ -35,6 +36,7 @@ interface RoomCardProps {
 }
 
 export function RoomCard({ group, onResidentClick }: RoomCardProps) {
+  const navigate = useNavigate();
   const severity = getRoomSeverity(group.residents);
   const hasAlert = severity === "alert";
   const [expanded, setExpanded] = useState(hasAlert);
@@ -43,6 +45,11 @@ export function RoomCard({ group, onResidentClick }: RoomCardProps) {
   const isVisited = group.roundingStatus === "visited";
   const isOverdue = group.roundingStatus === "overdue";
   const accentColor = SEVERITY_ACCENT[severity];
+
+  const handleRoomClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // No trigger expand/collapse
+    navigate(`/room/${group.room}`);
+  };
 
   return (
     <div
@@ -68,18 +75,33 @@ export function RoomCard({ group, onResidentClick }: RoomCardProps) {
           transition: "background 0.2s ease",
         }}
       >
-        {/* Room number */}
-        <span
+        {/* Room number (clickable) */}
+        <button
+          onClick={handleRoomClick}
           style={{
             fontSize: 13,
             fontWeight: theme.typography.fontWeight.bold,
             color: hasAlert ? theme.colors.error : theme.colors.primary[700],
             whiteSpace: "nowrap",
             minWidth: 32,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: "2px 4px",
+            margin: "-2px -4px",
+            borderRadius: theme.borderRadius.sm,
+            transition: "background 0.15s ease",
           }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = `${theme.colors.primary[100]}80`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "none";
+          }}
+          title="View room details"
         >
           {group.room}
-        </span>
+        </button>
 
         {/* Collapsed scan indicators (avatars + dots) hide on expand to reduce visual load on mobile */}
         <div

@@ -2,7 +2,7 @@
  * Resident utilities - color extraction, normalization, and room grouping
  */
 
-import type { Resident, RoomGroup, RoundingStatus } from "../types/resident.types";
+import type { Resident, RoomGroup, RoundingStatus, CVStatus } from "../types/resident.types";
 
 const DEFAULT_AVATAR_COLORS = ["#8B4A5E", "#A0586A", "#D4A0B0"];
 
@@ -55,5 +55,26 @@ export function groupResidentsByRoom(residents: Resident[]): RoomGroup[] {
     }
   }
 
-  return Array.from(map.values()).sort((a, b) => a.room.localeCompare(b.room));
+  // Calcular cvStatus para cada room basado en residentes
+  const groups = Array.from(map.values()).map((group) => {
+    const hasAnyCV = group.residents.some((r) => r.hasCV);
+    const allHaveCV = group.residents.every((r) => r.hasCV);
+
+    let cvStatus: CVStatus = "none";
+    let lastCVDetection: number | undefined;
+
+    if (allHaveCV && hasAnyCV) {
+      cvStatus = "active";
+      // Usar el lastCVDetection del primer residente (todos deberían ser similares)
+      lastCVDetection = group.residents[0]?.lastCVDetection;
+    }
+
+    return {
+      ...group,
+      cvStatus,
+      lastCVDetection,
+    };
+  });
+
+  return groups.sort((a, b) => a.room.localeCompare(b.room));
 }

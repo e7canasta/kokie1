@@ -7,6 +7,7 @@ import { TopCareCard } from "../../components/residents/TopCareCard/TopCareCard"
 import { ScreenLayout } from "../../components/layout/ScreenLayout";
 import { LoadingState } from "../../components/ui/LoadingState";
 import { ErrorState } from "../../components/ui/ErrorState";
+import { QuickActionBar } from "../../components/ui/QuickActionBar";
 
 export default function ResidentOverviewScreen() {
     const navigate = useNavigate();
@@ -17,8 +18,24 @@ export default function ResidentOverviewScreen() {
     };
 
     const handleViewRoom = (): void => {
-        // TODO: Implementar navegación a vista de habitación
-        console.log("Navigate to room");
+        if (resident?.room) {
+            navigate(`/room/${resident.room}`);
+        }
+    };
+
+    const handleConfirmVisit = (): void => {
+        console.log("Confirm visit for resident", resident?.id);
+        // TODO: Implementar confirmación de visita
+    };
+
+    const handleNote = (): void => {
+        console.log("Add note for resident", resident?.id);
+        // TODO: Implementar notas
+    };
+
+    const handleEscalate = (): void => {
+        console.log("Escalate alert for resident", resident?.id);
+        // TODO: Implementar escalamiento de alerta
     };
 
     if (isLoading) {
@@ -43,24 +60,42 @@ export default function ResidentOverviewScreen() {
 
     return (
         <ScreenLayout background="#FFFFFF">
-            <div style={{ height: 10 }} />
+            <div
+                style={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "hidden",
+                }}
+            >
+                <div style={{ height: 10 }} />
 
-            <ResidentHeader resident={resident} onBack={handleBack} />
+                <ResidentHeader resident={resident} onBack={handleBack} />
 
-            <div style={{ padding: "8px 20px 16px" }}>
-                <ViewRoomButton onClick={handleViewRoom} />
-            </div>
+                <div style={{ padding: "8px 20px 16px" }}>
+                    <ViewRoomButton onClick={handleViewRoom} />
+                </div>
 
-            <div style={{ overflowY: "auto", paddingBottom: 20 }}>
-                <WellnessCard
-                    data={{
-                        items: resident.wellnessData || [],
-                        trend: resident.wellness?.trend,
-                        previousTrend: resident.wellness?.previousTrend,
-                    }}
+                <div style={{ flex: 1, overflowY: "auto", paddingBottom: 20 }}>
+                    <WellnessCard
+                        data={{
+                            items: resident.wellnessData || [],
+                            trend: resident.wellness?.trend,
+                            previousTrend: resident.wellness?.previousTrend,
+                        }}
+                    />
+
+                    <TopCareCard />
+                </div>
+
+                {/* Quick Actions Bar */}
+                <QuickActionBar
+                    hasCV={resident.hasCV}
+                    lastDetected={resident.lastCVDetection}
+                    onConfirmVisit={handleConfirmVisit}
+                    onNote={handleNote}
+                    onEscalate={handleEscalate}
                 />
-
-                <TopCareCard />
             </div>
         </ScreenLayout>
     );
