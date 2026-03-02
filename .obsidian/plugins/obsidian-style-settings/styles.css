@@ -33,8 +33,8 @@
     top: -1px;
 }
 
-.style-settings-heading[data-level="0"]
-+ .style-settings-container
+.style-settings-heading[data-level="0"],
++ .style-settings-container,
 .style-settings-collapse-indicator {
     margin-left: -17px;
 }
