@@ -1,24 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-
-import {SearchBar} from "../../components/ui/SearchBar";
-import {MyResidentsSectionTitle} from "../../components/ui/titles/MyResidentsSectionTitle";
-import {RoundingButton} from "../../components/ui/RoundingButton";
-import {ResidentsGrid} from "../../components/residents/grid/ResidentsGrid";
-import {ResidentCard} from "../../components/residents/grid/ResidentCard";
-import {AllResidentsSectionTitle} from "../../components/ui/titles/AllResidentsSectionTitle";
-import {ResidentsList} from "../../components/residents/list/ResidentsList";
-import {ResidentsListItem} from "../../components/residents/list/ResidentsListItem";
-import {BottomNavigation} from "../../components/navigation/BottomNavigation";
-import {HomeIndicator} from "../../components/navigation/HomeIndicator";
+import { useResidents } from "../../hooks/useResidents";
+import { SearchBar } from "../../components/ui/SearchBar";
+import { MyResidentsSectionTitle } from "../../components/ui/titles/MyResidentsSectionTitle";
+import { RoundingButton } from "../../components/ui/RoundingButton";
+import { ResidentsGrid } from "../../components/residents/grid/ResidentsGrid";
+import { ResidentCard } from "../../components/residents/grid/ResidentCard";
+import { AllResidentsSectionTitle } from "../../components/ui/titles/AllResidentsSectionTitle";
+import { ResidentsList } from "../../components/residents/list/ResidentsList";
+import { ResidentsListItem } from "../../components/residents/list/ResidentsListItem";
+import { BottomNavigation } from "../../components/navigation/BottomNavigation";
+import { HomeIndicator } from "../../components/navigation/HomeIndicator";
+import { ScreenLayout } from "../../components/layout/ScreenLayout";
+import { LoadingState } from "../../components/ui/LoadingState";
+import { ErrorState } from "../../components/ui/ErrorState";
 import type { Resident } from "../../types/resident.types";
-
-const fetchResidents = async (): Promise<Resident[]> => {
-  const res = await fetch("/api/residents");
-  if (!res.ok) throw new Error("Failed to fetch residents");
-  return res.json();
-};
 
 // Helper function to extract colors from gradient string
 const extractColorsFromGradient = (gradient: string): string[] => {
@@ -34,46 +30,46 @@ export default function ResidentsScreen() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const { data: residents = [], isLoading, error } = useQuery<Resident[]>({
-    queryKey: ["residents"],
-    queryFn: fetchResidents,
-  });
-  
-  const filteredResidents: Resident[] = residents.filter((r) =>
-      r.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const { residents: filteredResidents, isLoading, isError, error, refetch } = useResidents(search);
   
   const handleResidentClick = (id: number): void => {
     navigate(`/resident/${id}`);
   };
 
+  if (isLoading) {
+    return (
+      <ScreenLayout>
+        <LoadingState fullScreen message="Loading residents..." />
+      </ScreenLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <ScreenLayout>
+        <ErrorState
+          fullScreen
+          message={error?.message || "Failed to load residents"}
+          onRetry={() => refetch()}
+        />
+      </ScreenLayout>
+    );
+  }
+
   return (
-    <>
+    <ScreenLayout>
       <div style={{
-        width: "100vw",
-        minHeight: "100vh",
-        background: "#F6F5F3",
-        overflow: "hidden",
+        flex: 1,
+        overflowY: "auto",
+        paddingBottom: 10,
         boxShadow: "0 30px 90px rgba(0,0,0,0.2), 0 10px 30px rgba(0,0,0,0.12)",
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
       }}>
-        <div style={{
-          flex: 1,
-          overflowY: "auto",
-          paddingBottom: 10,
-        }}>
+        <SearchBar value={search} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)} />
 
-          <SearchBar value={search} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)} />
-
-          <MyResidentsSectionTitle />
-          <RoundingButton />
-          
-          {isLoading && <div style={{ padding: 20 }}>Loading...</div>}
-          {error && <div style={{ padding: 20, color: "red" }}>Error loading residents</div>}
-          
-          {!isLoading && !error && (
+        <MyResidentsSectionTitle />
+        <RoundingButton />
+        
+        {filteredResidents.length > 0 && (
             <>
               <ResidentsGrid 
                 residents={filteredResidents.slice(0, 4).map((r): Resident => ({
@@ -102,13 +98,17 @@ export default function ResidentsScreen() {
                 )} 
               />
             </>
-          )}
-
-        </div>
-
-        <BottomNavigation />
-        <HomeIndicator />
+        )}
+        
+        {filteredResidents.length === 0 && search && (
+          <div style={{ padding: 40, textAlign: "center", color: "#666" }}>
+            No residents found matching "{search}"
+          </div>
+        )}
       </div>
-    </>
+
+      <BottomNavigation />
+      <HomeIndicator />
+    </ScreenLayout>
   );
 }

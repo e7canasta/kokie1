@@ -2,10 +2,6 @@ import {UpArrowIcon} from "../../../icons/UpArrowIcon";
 import type { WellnessCardProps, WellnessDataItem } from "../../../types/resident.types";
 
 export function WellnessCard({data}: WellnessCardProps) {
-    // Debug: verificar datos recibidos
-    console.log("WellnessCard data:", data);
-    console.log("WellnessCard items:", data.items);
-    
     return (
         <div style={{
             margin: "0 20px",
@@ -18,12 +14,9 @@ export function WellnessCard({data}: WellnessCardProps) {
 
             <div style={{height: 1, background: "#ECECEC", margin: "0 16px"}}/>
 
-            {data.items.map((item, i) => {
-                console.log(`Item ${i}:`, item);
-                return (
-                    <WellnessRow key={i} item={item} isLast={i === data.items.length - 1}/>
-                );
-            })}
+            {data.items.map((item, i) => (
+                <WellnessRow key={i} item={item} isLast={i === data.items.length - 1}/>
+            ))}
         </div>
     );
 }

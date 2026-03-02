@@ -77,10 +77,10 @@ const residents = [
 ];
 
 const wellnessData = [
-  { label: "Mood", value: "Good", icon: "😊" },
-  { label: "Sleep", value: "7h", icon: "😴" },
-  { label: "Activity", value: "Active", icon: "🚶" },
-  { label: "Appetite", value: "Normal", icon: "🍽️" },
+  { label: "Mood", current: "Good", previous: "Fair", icon: "😊" },
+  { label: "Sleep", current: "7h", previous: "6.5h", icon: "😴" },
+  { label: "Activity", current: "Active", previous: "Moderate", icon: "🚶" },
+  { label: "Appetite", current: "Normal", previous: "Reduced", icon: "🍽️" },
 ];
 
 const topCare = [
