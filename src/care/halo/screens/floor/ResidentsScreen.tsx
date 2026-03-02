@@ -19,6 +19,16 @@ const fetchResidents = async () => {
   return res.json();
 };
 
+// Helper function to extract colors from gradient string
+const extractColorsFromGradient = (gradient: string): string[] => {
+  // Extract hex colors from gradient string like "linear-gradient(135deg, #2E7D6F, #1B5E50)"
+  const matches = gradient.match(/#[0-9A-Fa-f]{6}/g);
+  if (matches && matches.length >= 2) {
+    return [matches[0], matches[1], matches[1] + "80"]; // Add transparency to third color
+  }
+  return ["#8B4A5E", "#A0586A", "#D4A0B0"]; // Default fallback
+};
+
 export default function ResidentsScreen() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
@@ -27,11 +37,10 @@ export default function ResidentsScreen() {
     queryKey: ["residents"],
     queryFn: fetchResidents,
   });
-
-  const filteredResidents = residents.filter((r: { name: string }) => 
-    r.name.toLowerCase().includes(search.toLowerCase())
+  
+  const filteredResidents = residents.filter((r: { name: string }) =>
+      r.name.toLowerCase().includes(search.toLowerCase())
   );
-
   const handleResidentClick = (id: number) => {
     navigate(`/resident/${id}`);
   };
@@ -54,7 +63,7 @@ export default function ResidentsScreen() {
           paddingBottom: 10,
         }}>
 
-          <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
+          <SearchBar value={search} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)} />
 
           <MyResidentsSectionTitle />
           <RoundingButton />
@@ -64,18 +73,32 @@ export default function ResidentsScreen() {
           
           {!isLoading && !error && (
             <>
-              <ResidentsGrid callbackfn={(resident: { id: number; name: string; room: string; image: string }) => (
-                  <div key={resident.name} onClick={() => handleResidentClick(resident.id)} style={{ cursor: "pointer" }}>
+              <ResidentsGrid 
+                residents={filteredResidents.slice(0, 4).map((r: any) => ({
+                  ...r,
+                  colors: r.avatarGradient 
+                    ? extractColorsFromGradient(r.avatarGradient)
+                    : ["#8B4A5E", "#A0586A", "#D4A0B0"]
+                }))}
+                callbackfn={(resident: { id: number; name: string; room: string; image: string }) => (
+                  <div key={resident.id} onClick={() => handleResidentClick(resident.id)} style={{ cursor: "pointer" }}>
                     <ResidentCard resident={resident} />
                   </div>
-              )} />
+                )} 
+              />
 
               <AllResidentsSectionTitle />
-              <ResidentsList prop={(resident: { id: number; name: string; room: string; age: number; image: string }, i: number) => (
-                  <div key={`${resident.name}-${i}`} onClick={() => handleResidentClick(resident.id)} style={{ cursor: "pointer" }}>
-                    <ResidentsListItem resident={resident} i={i} />
+              <ResidentsList 
+                residents={filteredResidents.map((r: any) => ({
+                  ...r,
+                  starred: r.starred || false
+                }))}
+                prop={(resident: { id: number; name: string; room: string; age: number; image: string }, i: number) => (
+                  <div key={resident.id} onClick={() => handleResidentClick(resident.id)} style={{ cursor: "pointer" }}>
+                    <ResidentsListItem resident={resident} i={i} totalResidents={filteredResidents.length} />
                   </div>
-              )} />
+                )} 
+              />
             </>
           )}
 

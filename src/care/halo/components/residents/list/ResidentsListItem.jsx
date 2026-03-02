@@ -1,8 +1,8 @@
 import {StarFilledIcon} from "../../../icons/StarFilledIcon.jsx";
 import {StarOutline} from "../../../icons/StarOutlineIcon.jsx";
-import {allResidents} from "../../../domain/residents.jsx";
 
 export function ResidentsListItem(props) {
+    const totalResidents = props.totalResidents || 0;
     return <div>
         <div style={{
             display: "flex",
@@ -31,7 +31,7 @@ export function ResidentsListItem(props) {
                 {props.resident.starred ? <StarFilledIcon/> : <StarOutline/>}
             </div>
         </div>
-        {props.i < allResidents.length - 1 && (
+        {props.i < totalResidents - 1 && (
             <div style={{height: 1, background: "#F0EFED", margin: "0 18px"}}/>
         )}
     </div>;

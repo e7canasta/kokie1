@@ -1,13 +1,5 @@
 import { create } from 'zustand';
-
-interface Resident {
-  id: number;
-  name: string;
-  room: string;
-  age: number;
-  wellness: { trend: string; previousTrend: string };
-  image: string;
-}
+import type { Resident } from '../care/halo/types/resident.types';
 
 interface AppState {
   selectedResidentId: number | null;
