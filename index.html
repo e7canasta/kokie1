@@ -23,6 +23,13 @@
             height: 100%;
             overflow: hidden;
         }
+        html, body, #root, * {
+          -webkit-user-select: none;  /* Chrome, Safari, Android */
+          -moz-user-select: none;     /* Firefox */
+          -ms-user-select: none;      /* IE/Edge */
+          user-select: none;          /* Estándar */
+          -webkit-touch-callout: none; /* Deshabilita el menú de "Guardar imagen" en iOS/Android */
+        }
     </style>
   </head>
   <body>
@@ -30,7 +37,7 @@
     <button id="liquid-glass-btn"
       style="
         position: fixed;
-        top: 18px;
+        bottom: 120px;
         right: 18px;
         z-index: 1000;
         padding: 14px 19px;
