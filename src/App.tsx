@@ -1,5 +1,7 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ErrorBoundary } from './care/halo/components/ui/ErrorBoundary';
+import { PageTransition } from './care/halo/components/navigation/PageTransition';
 import ResidentsScreen from './care/halo/screens/floor/ResidentsScreen';
 import ResidentOverviewScreen from './care/halo/screens/resident/ResidentOverviewScreen';
 import CareActivitiesScreen from './care/halo/screens/resident/CareActivitiesScreen';
@@ -10,11 +12,15 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<ResidentsScreen />} />
-          <Route path="/resident/:id" element={<ResidentOverviewScreen />} />
-          <Route path="/resident/:id/care-activities" element={<CareActivitiesScreen />} />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route element={<PageTransition><Outlet /></PageTransition>}>
+              <Route path="/" element={<ResidentsScreen />} />
+              <Route path="/resident/:id" element={<ResidentOverviewScreen />} />
+              <Route path="/resident/:id/care-activities" element={<CareActivitiesScreen />} />
+            </Route>
+          </Routes>
+        </ErrorBoundary>
       </BrowserRouter>
     </QueryClientProvider>
   );

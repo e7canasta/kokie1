@@ -1,3 +1,6 @@
+/** Number of residents shown in "My Residents" grid (configurable per unit/user later) */
+export const MY_RESIDENTS_LIMIT = 4;
+
 // Datos estáticos de residents (deprecated - usar API)
 export interface StaticResident {
     name: string;

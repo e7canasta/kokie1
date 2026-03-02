@@ -1,37 +1,48 @@
-import {Avatar} from "../../ui/Avatar";
+import { theme } from "../../../design-system";
+import { Avatar } from "../../ui/Avatar";
 import type { ResidentCardProps } from "../../../types/resident.types";
 
 export function ResidentCard(props: ResidentCardProps) {
-    return <div
-        style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "10px 10px",
-            background: "#FFFFFF",
-            borderRadius: 12,
-            border: "1px solid #E8E4DE",
-            cursor: "pointer",
-        }}
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: theme.spacing.sm,
+        padding: "10px 10px",
+        background: theme.colors.background.primary,
+        borderRadius: theme.borderRadius.md,
+        border: `1px solid ${theme.colors.border.light}`,
+        cursor: "pointer",
+      }}
     >
-        <Avatar name={props.resident.name} size={40} colors={props.resident.colors}/>
-        <div style={{minWidth: 0, flex: 1}}>
-                  <span style={{
-                      fontSize: 15, // Aumentado de 11px a 15px para legibilidad
-                      fontWeight: 700,
-                      color: "#1A1A1A",
-                      display: "block",
-                      lineHeight: 1.3,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                  }}>{props.resident.name}</span>
-            <span style={{
-                fontSize: 13, // Aumentado de 9.5px a 13px
-                color: "#666", // Mejor contraste que #888
-                fontWeight: 500, // Medium para mejor legibilidad
-                display: "block",
-                marginTop: 2,
-            }}>{props.resident.room}</span>
-        </div>
-    </div>;
+      <Avatar name={props.resident.name} size={40} colors={props.resident.colors} />
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <span
+          style={{
+            fontSize: theme.typography.fontSize.base,
+            fontWeight: theme.typography.fontWeight.bold,
+            color: theme.colors.text.primary,
+            display: "block",
+            lineHeight: theme.typography.lineHeight.tight,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {props.resident.name}
+        </span>
+        <span
+          style={{
+            fontSize: theme.typography.fontSize.xs,
+            color: theme.colors.text.secondary,
+            fontWeight: theme.typography.fontWeight.medium,
+            display: "block",
+            marginTop: 2,
+          }}
+        >
+          {props.resident.room}
+        </span>
+      </div>
+    </div>
+  );
 }

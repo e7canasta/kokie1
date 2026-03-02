@@ -65,10 +65,12 @@ export const commonStyles = {
     fontFamily: theme.typography.fontFamily.primary,
   },
   
-  // Screen container
+  // Screen container - height 100vh so flex children (e.g. bottom nav) stay at viewport bottom
   screenContainer: {
     fontFamily: theme.typography.fontFamily.primary,
+    height: "100vh",
     minHeight: "100vh",
+    maxHeight: "100vh",
     background: theme.colors.background.secondary,
     overflow: "hidden",
     position: "relative",

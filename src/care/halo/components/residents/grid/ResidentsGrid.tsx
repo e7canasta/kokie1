@@ -1,16 +1,18 @@
+import { theme } from "../../../design-system";
 import type { ResidentsGridProps } from "../../../types/resident.types";
 
 export function ResidentsGrid(props: ResidentsGridProps) {
-    const residents = props.residents || [];
-    return <>
-        {/* My Residents Grid - 2x2 */}
-        <div style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 8,
-            padding: "0 16px 16px",
-        }}>
-            {residents.map(props.callbackfn)}
-        </div>
-    </>;
+  const residents = props.residents || [];
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: theme.spacing.sm,
+        padding: `0 ${theme.spacing.md} ${theme.spacing.md}`,
+      }}
+    >
+      {residents.map(props.renderItem)}
+    </div>
+  );
 }

@@ -5,7 +5,7 @@ export function ResidentsList(props: ResidentsListProps) {
     return <>
         {/* All Residents List */}
         <div style={{background: "#FFFFFF", margin: "0 0px"}}>
-            {residents.map(props.prop)}
+            {residents.map((resident, i) => props.renderItem(resident, i))}
         </div>
     </>;
 }

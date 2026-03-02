@@ -10,19 +10,14 @@ Esta aplicación está diseñada para **enfermeros en contexto de trabajo móvil
 
 ## ✨ Mejoras Implementadas
 
+Todas las mejoras siguientes están **integradas** en la app: PageTransition y Error Boundary en `App.tsx`; PullToRefresh, ResidentCardEnhanced y BottomNavigationEnhanced en `ResidentsScreen`.
+
 ### 1. 🎬 Transiciones de Página (iOS-like)
-**Archivo**: `components/navigation/PageTransition.tsx`
+**Archivo**: `components/navigation/PageTransition.tsx` — integrado en `App.tsx` (envuelve las rutas).
 
 - Transiciones suaves entre pantallas
 - Efecto slide-in/slide-out tipo iOS
 - Mejora la percepción de fluidez y profesionalismo
-
-**Uso**:
-```tsx
-<PageTransition>
-  <YourScreen />
-</PageTransition>
-```
 
 ### 2. 👆 Gestos de Swipe
 **Archivo**: `hooks/useSwipeGesture.ts`
@@ -37,7 +32,7 @@ Esta aplicación está diseñada para **enfermeros en contexto de trabajo móvil
 - Reduce fricción en el flujo de trabajo
 
 ### 3. 🎨 Cards Mejoradas con Estados
-**Archivo**: `components/residents/ResidentCardEnhanced.tsx`
+**Archivo**: `components/residents/ResidentCardEnhanced.tsx` — usada en la grid de "My Residents" en `ResidentsScreen`.
 
 **Características**:
 - **Estados visuales**: Hover, press, active
@@ -52,14 +47,14 @@ Esta aplicación está diseñada para **enfermeros en contexto de trabajo móvil
 - ⚠️ Critical: Borde rojo grueso + pulso intenso
 
 ### 4. 🔄 Pull to Refresh
-**Archivo**: `components/ui/PullToRefresh.tsx`
+**Archivo**: `components/ui/PullToRefresh.tsx` — envuelve el contenido de la lista en `ResidentsScreen`.
 
 - Patrón estándar mobile para actualizar datos
 - Feedback visual durante el pull
 - Animación de carga
 
 ### 5. 📱 Navegación Mejorada
-**Archivo**: `components/navigation/BottomNavigationEnhanced.tsx`
+**Archivo**: `components/navigation/BottomNavigationEnhanced.tsx` — usada en `ResidentsScreen`.
 
 **Mejoras**:
 - Animaciones en transiciones

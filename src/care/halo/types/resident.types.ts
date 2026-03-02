@@ -45,7 +45,7 @@ export interface ResidentCardProps {
 
 export interface ResidentsGridProps {
   residents: Resident[];
-  callbackfn: (resident: Resident) => React.ReactNode;
+  renderItem: (resident: Resident) => React.ReactNode;
 }
 
 export interface ResidentsListItemProps {
@@ -56,7 +56,7 @@ export interface ResidentsListItemProps {
 
 export interface ResidentsListProps {
   residents: Resident[];
-  prop: (resident: Resident, i: number) => React.ReactNode;
+  renderItem: (resident: Resident, i: number) => React.ReactNode;
 }
 
 export interface ResidentHeaderProps {

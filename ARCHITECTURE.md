@@ -36,6 +36,8 @@ src/
 │       │   ├── overview.ts
 │       │   └── residents.ts
 │       │
+│       ├── utils/             # Utilidades (p. ej. residentUtils: colores avatar)
+│       │
 │       └── icons/             # Iconos SVG
 │
 ├── store/                     # Estado global (Zustand)
@@ -91,7 +93,8 @@ const resident = await residentsApi.getResidentById(id);
 
 ### useResidents
 - Maneja fetching de lista de residents
-- Incluye filtrado por búsqueda
+- Incluye filtrado por búsqueda y normalización de colores (avatar)
+- Expone `residents` (filtrados con colores), `myResidents` (primeros N para grid) y `allResidents`
 - Memoización automática
 
 ## 📦 Componentes
@@ -123,7 +126,7 @@ const resident = await residentsApi.getResidentById(id);
 - Lazy loading de rutas cuando sea necesario
 
 ### 4. Consistencia
-- Usar siempre el theme para estilos
+- Usar siempre el theme para estilos (obligatorio en componentes UI: color, tipografía, espaciado, sombras)
 - Componentes de layout para estructura común
 - Hooks personalizados para lógica compartida
 
@@ -145,7 +148,7 @@ Screen → Hook → API Service → Backend
 
 ## 🎯 Próximos Pasos Sugeridos
 
-1. **Error Boundaries**: Para capturar errores de renderizado
+1. ~~**Error Boundaries**~~: Implementado en `components/ui/ErrorBoundary.tsx`, envuelve las rutas en `App.tsx`.
 2. **Context Providers**: Para estado compartido (preferencias, usuario)
 3. **Form Handling**: Biblioteca para formularios (React Hook Form)
 4. **Testing**: Setup de tests unitarios e integración
