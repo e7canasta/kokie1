@@ -12,6 +12,7 @@ import { ErrorState } from "../../components/ui/ErrorState";
 import { PullToRefresh } from "../../components/ui/PullToRefresh";
 import { AnimateOnScroll } from "../../components/ui/AnimateOnScroll";
 import { CommandCenter } from "../../components/ui/CommandCenter";
+import { CVMetrics } from "../../components/ui/CVMetrics";
 import { theme } from "../../design-system";
 import { useMemo, useRef } from "react";
 
@@ -38,7 +39,7 @@ export default function ResidentsScreen() {
     navigate(`/resident/${id}`);
   };
 
-  // Command Center data
+  // Command Center data + CV Metrics (Sprint 3 P2)
   const commandCenterData = useMemo(() => {
     const totalAlerts = residents.filter((r) => r.wellness?.trend === "Low").length;
     const overdueRooms = roomGroups.filter((g) => g.roundingStatus === "overdue").length;
@@ -47,9 +48,13 @@ export default function ResidentsScreen() {
       return !hasAlert && (g.roundingStatus === "visited" || g.roundingStatus === "pending");
     }).length;
 
-    // CV coverage (mock - en producción vendría del backend)
+    // CV coverage
     const roomsWithCV = roomGroups.filter((g) => g.cvStatus === "active").length;
     const cvCoverage = roomGroups.length > 0 ? roomsWithCV / roomGroups.length : 0;
+
+    // Sprint 3 (P2) - CV Metrics: confirmaciones ahorradas
+    // Mock: rooms con CV ahorran ~4 confirmaciones/room por día
+    const confirmationsSaved = roomsWithCV * 4;
 
     // Next room: prioridad overdue con alerts, luego overdue, luego pending con alerts
     const nextRoom =
@@ -68,6 +73,9 @@ export default function ResidentsScreen() {
       ok: okRooms,
       cvCoverage,
       nextRoom,
+      roomsWithCV,
+      totalRooms: roomGroups.length,
+      confirmationsSaved,
     };
   }, [residents, roomGroups]);
 
@@ -117,6 +125,13 @@ export default function ResidentsScreen() {
                 onGoToNext={handleGoToNext}
               />
             </div>
+
+            {/* Sprint 3 (P2) - CV Metrics */}
+            <CVMetrics
+              roomsWithCV={commandCenterData.roomsWithCV}
+              totalRooms={commandCenterData.totalRooms}
+              confirmationsSaved={commandCenterData.confirmationsSaved}
+            />
 
             {/* Unit context (simplified) */}
             <div

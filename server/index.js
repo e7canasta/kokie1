@@ -301,6 +301,30 @@ app.get('/api/residents/:id', (req, res) => {
   res.json({ ...resident, wellnessData, topCare });
 });
 
+// Sprint 3 (P2) - Toggle care activity done status
+app.patch('/api/residents/:id/care-activities/:activityTitle', (req, res) => {
+  const residentId = parseInt(req.params.id);
+  const activityTitle = decodeURIComponent(req.params.activityTitle);
+  const { done } = req.body;
+
+  const resident = residents.find(r => r.id === residentId);
+  if (!resident) {
+    return res.status(404).json({ error: "Resident not found" });
+  }
+
+  // Find and update the activity in topCare
+  const activity = topCare.find(a => a.title === activityTitle);
+  if (!activity) {
+    return res.status(404).json({ error: "Activity not found" });
+  }
+
+  activity.done = done;
+  console.log(`[PATCH] Resident ${residentId} - ${activityTitle}: ${done ? 'completed' : 'pending'}`);
+
+  // Return updated resident with topCare
+  res.json({ ...resident, wellnessData, topCare });
+});
+
 app.listen(PORT, () => {
   console.log(`Mock API server running at http://localhost:${PORT}`);
 });

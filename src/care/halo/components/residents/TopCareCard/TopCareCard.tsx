@@ -1,17 +1,72 @@
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useResident } from "../../../hooks/useResident";
 import { theme } from "../../../design-system";
 import { careActivitiesByTimeRange, timeRangeTabs } from "../../../domain/overview";
-import type { CareActivity, TimeRangeTab, TimeRangeTabsProps, ActivityRowProps } from "../../../types/resident.types";
+import { CheckableActivity } from "../../ui/CheckableActivity";
+import type { CareActivity, TimeRangeTab, TimeRangeTabsProps, ActivityRowProps, Resident } from "../../../types/resident.types";
 
 export function TopCareCard() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { resident, residentId } = useResident();
   const [activeTab, setActiveTab] = useState<TimeRangeTab>(timeRangeTabs[0]);
+  const queryClient = useQueryClient();
 
   const currentActivities = useMemo(() => {
     return careActivitiesByTimeRange[activeTab];
   }, [activeTab]);
+
+  // Sprint 3 (P2) - Mutation for toggling care activity
+  const toggleActivityMutation = useMutation({
+    mutationFn: async ({ title, done }: { title: string; done: boolean }) => {
+      const response = await fetch(
+        `/api/residents/${residentId}/care-activities/${encodeURIComponent(title)}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ done }),
+        }
+      );
+      if (!response.ok) throw new Error("Failed to update activity");
+      return response.json();
+    },
+    onMutate: async ({ title, done }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["resident", residentId] });
+
+      // Snapshot previous value
+      const previousResident = queryClient.getQueryData<Resident>(["resident", residentId]);
+
+      // Optimistically update
+      queryClient.setQueryData<Resident>(["resident", residentId], (old) => {
+        if (!old || !old.topCare) return old;
+        return {
+          ...old,
+          topCare: old.topCare.map((item) =>
+            item.title === title ? { ...item, done } : item
+          ),
+        };
+      });
+
+      return { previousResident };
+    },
+    onError: (_err, _variables, context) => {
+      // Rollback on error
+      if (context?.previousResident) {
+        queryClient.setQueryData(["resident", residentId], context.previousResident);
+      }
+    },
+    onSuccess: () => {
+      // Refetch to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ["resident", residentId] });
+    },
+  });
+
+  const handleToggleActivity = (title: string, done: boolean) => {
+    toggleActivityMutation.mutate({ title, done });
+  };
 
   return (
     <div style={{ padding: `${theme.spacing.lg} 20px 0` }}>
@@ -26,6 +81,39 @@ export function TopCareCard() {
       >
         Top Care Activities
       </h2>
+
+      {/* Sprint 3 (P2) - Today's Tasks (Checkable) */}
+      {resident?.topCare && resident.topCare.length > 0 && (
+        <div style={{ marginBottom: theme.spacing.lg }}>
+          <h3
+            style={{
+              fontSize: theme.typography.fontSize.md,
+              fontWeight: theme.typography.fontWeight.semibold,
+              color: theme.colors.text.secondary,
+              margin: `0 0 ${theme.spacing.sm} 0`,
+            }}
+          >
+            Today's Tasks
+          </h3>
+          <div
+            style={{
+              background: theme.colors.background.primary,
+              border: `1px solid ${theme.colors.border.light}`,
+              borderRadius: theme.borderRadius.md,
+              padding: "0 16px",
+            }}
+          >
+            {resident.topCare.map((item, i) => (
+              <div key={`${item.title}-${i}`}>
+                <CheckableActivity item={item} onToggle={handleToggleActivity} />
+                {i < resident.topCare!.length - 1 && (
+                  <div style={{ height: 1, background: theme.colors.border.light }} />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <TimeRangeTabs tabs={timeRangeTabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
