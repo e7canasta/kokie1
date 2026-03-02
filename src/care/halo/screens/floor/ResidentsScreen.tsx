@@ -1,9 +1,11 @@
+import { useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../../../../store";
 import { useResidents } from "../../hooks/useResidents";
+import { useRounding } from "../../context/RoundingContext";
 import { HotResidentsSlider } from "../../components/residents/HotResidentsSlider";
 import { RoomCard } from "../../components/residents/RoomCard";
-import { FloatingActionPill } from "../../components/navigation/FloatingActionPill";
+import { FloatingActionPill, type FabAction } from "../../components/navigation/FloatingActionPill";
 import { BottomNavigationEnhanced } from "../../components/navigation/BottomNavigationEnhanced";
 import { HomeIndicator } from "../../components/navigation/HomeIndicator";
 import { ScreenLayout } from "../../components/layout/ScreenLayout";
@@ -13,8 +15,8 @@ import { PullToRefresh } from "../../components/ui/PullToRefresh";
 import { AnimateOnScroll } from "../../components/ui/AnimateOnScroll";
 import { CommandCenter } from "../../components/ui/CommandCenter";
 import { CVMetrics } from "../../components/ui/CVMetrics";
+import { BottomSheet } from "../../components/ui/BottomSheet";
 import { theme } from "../../design-system";
-import { useMemo, useRef } from "react";
 
 const CURRENT_UNIT = "2nd Floor · Memory Care & AL";
 
@@ -33,6 +35,10 @@ export default function ResidentsScreen() {
   const { residents, hotResidents, roomGroups, isLoading, isError, error, refetch } = useResidents();
   const setSelectedResidentId = useAppStore((s) => s.setSelectedResidentId);
   const roomRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  // Sprint 1 (P0) - Rounding Flow
+  const { state: roundingState, startRounding, getRoundingProgress } = useRounding();
+  const [roundingSheetOpen, setRoundingSheetOpen] = useState(false);
 
   const handleResidentClick = (id: number): void => {
     setSelectedResidentId(id);
@@ -241,9 +247,159 @@ export default function ResidentsScreen() {
         </PullToRefresh>
       </div>
 
-      <FloatingActionPill action="rounding" onPress={() => console.log("Start rounding")} />
+      {/* Floating Action Pill — Contextual */}
+      <FloatingActionPill
+        action={roundingState.isActive ? "continue-rounding" : "rounding"}
+        onPress={() => setRoundingSheetOpen(true)}
+      />
+
+      {/* Rounding Start Bottom Sheet */}
+      <BottomSheet
+        isOpen={roundingSheetOpen}
+        onClose={() => setRoundingSheetOpen(false)}
+        height="auto"
+        title="Start Rounding"
+      >
+        <StartRoundingForm
+          totalRooms={roomGroups.length}
+          onStart={(roundType) => {
+            startRounding(roomGroups.length, roundType);
+            setRoundingSheetOpen(false);
+          }}
+          onCancel={() => setRoundingSheetOpen(false)}
+        />
+      </BottomSheet>
+
       <BottomNavigationEnhanced />
       <HomeIndicator />
     </ScreenLayout>
+  );
+}
+
+/**
+ * Start Rounding Form
+ * Permite seleccionar tipo de ronda (opcional)
+ */
+function StartRoundingForm({
+  totalRooms,
+  onStart,
+  onCancel,
+}: {
+  totalRooms: number;
+  onStart: (roundType?: string) => void;
+  onCancel: () => void;
+}) {
+  const [selectedType, setSelectedType] = useState<string>('');
+
+  const roundTypes = ['Medicación', 'Observación', 'Vigía', 'Alimentación', 'General'];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.lg }}>
+      <div>
+        <p style={{ margin: 0, fontSize: theme.typography.fontSize.sm, color: theme.colors.text.secondary }}>
+          You will visit {totalRooms} rooms
+        </p>
+      </div>
+
+      {/* Round type selector (optional) */}
+      <div>
+        <label
+          style={{
+            display: 'block',
+            fontSize: theme.typography.fontSize.sm,
+            fontWeight: theme.typography.fontWeight.semibold,
+            color: theme.colors.text.primary,
+            marginBottom: theme.spacing.sm,
+          }}
+        >
+          Round Type (Optional)
+        </label>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: theme.spacing.sm }}>
+          {roundTypes.map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setSelectedType(type)}
+              style={{
+                padding: theme.spacing.sm,
+                background: selectedType === type ? `${theme.colors.primary[500]}15` : theme.colors.background.secondary,
+                border: `1.5px solid ${selectedType === type ? theme.colors.primary[500] : theme.colors.border.light}`,
+                borderRadius: theme.borderRadius.sm,
+                fontSize: theme.typography.fontSize.sm,
+                fontWeight: theme.typography.fontWeight.medium,
+                color: selectedType === type ? theme.colors.primary[500] : theme.colors.text.secondary,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {type}
+            </button>
+          ))}
+        </div>
+        <p
+          style={{
+            margin: `${theme.spacing.xs} 0 0`,
+            fontSize: theme.typography.fontSize.xs,
+            color: theme.colors.text.tertiary,
+          }}
+        >
+          You can skip this or type a custom round name
+        </p>
+      </div>
+
+      {/* Custom type input */}
+      <div>
+        <input
+          type="text"
+          placeholder="Or type custom round name..."
+          value={selectedType}
+          onChange={(e) => setSelectedType(e.target.value)}
+          style={{
+            width: '100%',
+            padding: theme.spacing.md,
+            border: `1.5px solid ${theme.colors.border.medium}`,
+            borderRadius: theme.borderRadius.md,
+            fontSize: theme.typography.fontSize.base,
+            outline: 'none',
+          }}
+        />
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: theme.spacing.md }}>
+        <button
+          onClick={onCancel}
+          style={{
+            flex: 1,
+            padding: theme.spacing.md,
+            background: theme.colors.background.secondary,
+            border: `1.5px solid ${theme.colors.border.medium}`,
+            borderRadius: theme.borderRadius.md,
+            fontSize: theme.typography.fontSize.base,
+            fontWeight: theme.typography.fontWeight.semibold,
+            color: theme.colors.text.primary,
+            cursor: 'pointer',
+          }}
+        >
+          Cancel
+        </button>
+        <button
+          onClick={() => onStart(selectedType || undefined)}
+          style={{
+            flex: 1,
+            padding: theme.spacing.md,
+            background: 'linear-gradient(135deg, #FF6B35, #E84E1B)',
+            border: 'none',
+            borderRadius: theme.borderRadius.md,
+            fontSize: theme.typography.fontSize.base,
+            fontWeight: theme.typography.fontWeight.semibold,
+            color: theme.colors.text.inverse,
+            cursor: 'pointer',
+          }}
+        >
+          Start Rounding
+        </button>
+      </div>
+    </div>
   );
 }

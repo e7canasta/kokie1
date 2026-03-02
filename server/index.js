@@ -325,6 +325,128 @@ app.patch('/api/residents/:id/care-activities/:activityTitle', (req, res) => {
   res.json({ ...resident, wellnessData, topCare });
 });
 
+// Sprint 1 (P0) - Quick Actions Endpoints
+
+// In-memory storage para visits, notes, alerts
+let visits = [];
+let notes = [];
+let alerts = [];
+
+// POST /api/visits - Confirmar visita manual (para rooms sin CV)
+app.post('/api/visits', (req, res) => {
+  const { residentId, timestamp = new Date().toISOString() } = req.body;
+
+  const resident = residents.find(r => r.id === parseInt(residentId));
+  if (!resident) {
+    return res.status(404).json({ error: "Resident not found" });
+  }
+
+  const visit = {
+    id: visits.length + 1,
+    residentId: parseInt(residentId),
+    residentName: resident.name,
+    room: resident.room,
+    bed: resident.bed,
+    timestamp,
+    type: 'manual', // manual vs CV-detected
+  };
+
+  visits.push(visit);
+  console.log(`[POST] Visit confirmed: ${resident.name} (Room ${resident.room}${resident.bed}) at ${timestamp}`);
+
+  res.status(201).json({
+    success: true,
+    visit,
+    message: `Visit confirmed for ${resident.name}`
+  });
+});
+
+// POST /api/notes - Agregar nota rápida
+app.post('/api/notes', (req, res) => {
+  const { residentId, content, category = 'observation', timestamp = new Date().toISOString() } = req.body;
+
+  if (!content || content.trim() === '') {
+    return res.status(400).json({ error: "Note content is required" });
+  }
+
+  const resident = residents.find(r => r.id === parseInt(residentId));
+  if (!resident) {
+    return res.status(404).json({ error: "Resident not found" });
+  }
+
+  const note = {
+    id: notes.length + 1,
+    residentId: parseInt(residentId),
+    residentName: resident.name,
+    room: resident.room,
+    bed: resident.bed,
+    content: content.trim(),
+    category, // observation, medication, behavior, other
+    timestamp,
+    author: 'Nurse', // En producción vendría del auth
+  };
+
+  notes.push(note);
+  console.log(`[POST] Note added for ${resident.name}: "${content.substring(0, 50)}..."`);
+
+  res.status(201).json({
+    success: true,
+    note,
+    message: `Note saved for ${resident.name}`
+  });
+});
+
+// POST /api/alerts - Escalar alerta
+app.post('/api/alerts', (req, res) => {
+  const { residentId, reason, severity = 'medium', timestamp = new Date().toISOString() } = req.body;
+
+  if (!reason || reason.trim() === '') {
+    return res.status(400).json({ error: "Alert reason is required" });
+  }
+
+  const resident = residents.find(r => r.id === parseInt(residentId));
+  if (!resident) {
+    return res.status(404).json({ error: "Resident not found" });
+  }
+
+  const alert = {
+    id: alerts.length + 1,
+    residentId: parseInt(residentId),
+    residentName: resident.name,
+    room: resident.room,
+    bed: resident.bed,
+    reason: reason.trim(),
+    severity, // low, medium, high, critical
+    timestamp,
+    status: 'active', // active, acknowledged, resolved
+    reportedBy: 'Nurse',
+  };
+
+  alerts.push(alert);
+  console.log(`[POST] Alert escalated for ${resident.name}: ${severity.toUpperCase()} - "${reason}"`);
+
+  res.status(201).json({
+    success: true,
+    alert,
+    message: `Alert escalated for ${resident.name}`
+  });
+});
+
+// GET /api/visits - Obtener historial de visitas (para verificación)
+app.get('/api/visits', (req, res) => {
+  res.json(visits);
+});
+
+// GET /api/notes - Obtener todas las notas
+app.get('/api/notes', (req, res) => {
+  res.json(notes);
+});
+
+// GET /api/alerts - Obtener todas las alertas
+app.get('/api/alerts', (req, res) => {
+  res.json(alerts);
+});
+
 app.listen(PORT, () => {
   console.log(`Mock API server running at http://localhost:${PORT}`);
 });

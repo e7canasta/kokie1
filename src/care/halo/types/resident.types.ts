@@ -155,3 +155,57 @@ export interface QuickActionBarProps {
   onNote: () => void;
   onEscalate: () => void;
 }
+
+// Room type for Room Detail Screen
+export interface Room {
+  id: string;
+  number: string;
+  unit: string;
+  // CV fields
+  hasCV: boolean;
+  cvStatus: CVStatus;
+  cvLastDetection: number | null; // minutes ago
+  // Residents (beds)
+  beds: Resident[];
+  // Rounding
+  roundingStatus: RoundingStatus;
+  lastVisitedMinutesAgo?: number;
+}
+
+// Visit type (for tracking manual confirmations)
+export interface Visit {
+  id: number;
+  residentId: number;
+  residentName: string;
+  room: string;
+  bed: string;
+  timestamp: string;
+  type: 'manual' | 'cv-detected';
+}
+
+// Note type
+export interface Note {
+  id: number;
+  residentId: number;
+  residentName: string;
+  room: string;
+  bed: string;
+  content: string;
+  category: 'observation' | 'medication' | 'behavior' | 'other';
+  timestamp: string;
+  author: string;
+}
+
+// Alert type
+export interface Alert {
+  id: number;
+  residentId: number;
+  residentName: string;
+  room: string;
+  bed: string;
+  reason: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  timestamp: string;
+  status: 'active' | 'acknowledged' | 'resolved';
+  reportedBy: string;
+}

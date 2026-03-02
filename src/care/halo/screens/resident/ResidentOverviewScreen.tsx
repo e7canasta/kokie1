@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useResident } from "../../hooks/useResident";
 import { useResidentNavigation } from "../../hooks/useResidentNavigation";
 import { useSwipeGesture } from "../../hooks/useSwipeGesture";
+import { useConfirmVisit, useAddNote, useEscalateAlert } from "../../hooks/useActions";
 import { ResidentHeader } from "./ResidentHeader";
 import { ViewRoomButton } from "./ViewRoomButton";
 import { WellnessCard } from "../../components/residents/WellnessCard/WellnessCard";
@@ -10,11 +12,23 @@ import { ScreenLayout } from "../../components/layout/ScreenLayout";
 import { LoadingState } from "../../components/ui/LoadingState";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { QuickActionBar } from "../../components/ui/QuickActionBar";
+import { BottomSheet } from "../../components/ui/BottomSheet";
+import { NoteForm } from "../../components/forms/NoteForm";
+import { EscalateForm } from "../../components/forms/EscalateForm";
 import { theme } from "../../design-system";
 
 export default function ResidentOverviewScreen() {
     const navigate = useNavigate();
     const { resident, isLoading, isError, error, refetch } = useResident();
+
+    // Bottom sheet states
+    const [noteSheetOpen, setNoteSheetOpen] = useState(false);
+    const [escalateSheetOpen, setEscalateSheetOpen] = useState(false);
+
+    // Sprint 1 (P0) - Quick Actions mutations
+    const confirmVisitMutation = useConfirmVisit();
+    const addNoteMutation = useAddNote();
+    const escalateAlertMutation = useEscalateAlert();
 
     // Sprint 2 (P1) - Swipe navigation between residents
     const navigation = resident ? useResidentNavigation(resident.id) : null;
@@ -37,19 +51,43 @@ export default function ResidentOverviewScreen() {
         }
     };
 
-    const handleConfirmVisit = (): void => {
-        console.log("Confirm visit for resident", resident?.id);
-        // TODO: Implementar confirmación de visita
+    const handleConfirmVisit = async (): Promise<void> => {
+        if (!resident) return;
+
+        await confirmVisitMutation.mutateAsync(resident.id);
+        // Auto-advance if in rounding mode (future: check RoundingContext)
     };
 
     const handleNote = (): void => {
-        console.log("Add note for resident", resident?.id);
-        // TODO: Implementar notas
+        setNoteSheetOpen(true);
+    };
+
+    const handleNoteSubmit = async (content: string, category: 'observation' | 'medication' | 'behavior' | 'other'): Promise<void> => {
+        if (!resident) return;
+
+        await addNoteMutation.mutateAsync({
+            residentId: resident.id,
+            content,
+            category,
+        });
+
+        setNoteSheetOpen(false);
     };
 
     const handleEscalate = (): void => {
-        console.log("Escalate alert for resident", resident?.id);
-        // TODO: Implementar escalamiento de alerta
+        setEscalateSheetOpen(true);
+    };
+
+    const handleEscalateSubmit = async (reason: string, severity: 'low' | 'medium' | 'high' | 'critical'): Promise<void> => {
+        if (!resident) return;
+
+        await escalateAlertMutation.mutateAsync({
+            residentId: resident.id,
+            reason,
+            severity,
+        });
+
+        setEscalateSheetOpen(false);
     };
 
     if (isLoading) {
@@ -165,6 +203,34 @@ export default function ResidentOverviewScreen() {
                     onEscalate={handleEscalate}
                 />
             </div>
+
+            {/* Note Bottom Sheet */}
+            <BottomSheet
+                isOpen={noteSheetOpen}
+                onClose={() => setNoteSheetOpen(false)}
+                height="auto"
+            >
+                <NoteForm
+                    residentName={resident.name}
+                    onSubmit={handleNoteSubmit}
+                    onCancel={() => setNoteSheetOpen(false)}
+                    isLoading={addNoteMutation.isPending}
+                />
+            </BottomSheet>
+
+            {/* Escalate Alert Bottom Sheet */}
+            <BottomSheet
+                isOpen={escalateSheetOpen}
+                onClose={() => setEscalateSheetOpen(false)}
+                height="auto"
+            >
+                <EscalateForm
+                    residentName={resident.name}
+                    onSubmit={handleEscalateSubmit}
+                    onCancel={() => setEscalateSheetOpen(false)}
+                    isLoading={escalateAlertMutation.isPending}
+                />
+            </BottomSheet>
         </ScreenLayout>
     );
 }
