@@ -1,0 +1,114 @@
+---
+description: UX Assisted Triage — the core interaction philosophy for Halo Care. Guides all screen, component, and data-display decisions. 
+alwaysApply: true
+---
+
+# UX Assisted Triage — Halo Care Design Philosophy
+
+## Core Principle
+
+The system manages the nurse's attention, not the other way around. Halo Care knows the rounding schedule, which rooms were visited (via CV), resident wellness trends, pending care activities, and alerts. It uses this intelligence to **surface what matters and hide what doesn't**.
+
+## The Two States
+
+Every information unit (room card, resident, task, alert) exists in one of two modes:
+
+1. **Calm** — nothing requires action. Collapsed, compact, a single-glance confirmation: "all good here." Green accent, checkmark, minimal footprint.
+2. **Attention** — something needs the nurse. Auto-expanded, highlighted, detail visible without tapping. Red/orange accent, pulsing indicators, badge counts.
+
+The nurse should **never have to hunt** for what needs attention. If nothing is expanded, nothing needs action. If something is expanded, that's where to go.
+
+## Visual Severity Language
+
+| Severity | Left Accent | Auto-Expand | Indicator |
+|----------|------------|-------------|-----------|
+| Alert (Low wellness) | Red | Yes | Red badge with count, pulsing dots |
+| Monitor (Medium) | Orange | No | Orange dots |
+| Clear (High) | Green | No | Green checkmark if visited |
+
+## Rounding Awareness
+
+The system knows the nurse's rounding schedule and tracks visits via computer vision:
+
+- **Visited** — green checkmark, "Visited Xm ago" footer when expanded. Calm state.
+- **Pending** — neutral, no special indicator. The nurse will get there.
+- **Overdue** — orange "OVERDUE" label. Not urgent but the system nudges.
+
+Rounding status is independent of wellness severity. A visited room can still have alerts.
+
+## Collapse/Expand Rules
+
+- Rooms with **alerts auto-expand** on screen load. The nurse sees the detail immediately.
+- Rooms **without alerts stay collapsed**. One-line summary is enough.
+- The nurse can **manually toggle** any room. Her override is always respected.
+- Future: recently changed wellness (trend shift) could trigger temporary auto-expand.
+
+## Information Density Tiers
+
+Design for **three scan speeds** a nurse uses while moving through hallways:
+
+1. **Glance (< 1s)** — collapsed header: accent color + avatar stack + wellness dots. Enough to know "this room is fine" or "this room needs me."
+2. **Check (2-3s)** — expanded card: see which resident, what bed, what wellness label. Decide who to attend first.
+3. **Act (tap through)** — resident detail screen: full wellness data, care activities, history.
+
+## Favorites (My Residents) 
+
+Horizontal slider, not grid. Reasons:
+- Saves vertical space for the room board (the primary working view)
+- Scales to any count (2 or 20 favorites, always works)
+- Visually distinct from room cards (avatar-centric vs. list-centric)
+- Future: intelligent ordering by priority, wellness change, pending activities
+
+## Component Patterns
+
+### Room Card
+```
+Collapsed: [accent] RoomNum [avatar-stack] [wellness-dots] [spacer] [badge|status] [occ] [chevron]
+Expanded:  2-col grid of residents + rounding footer
+```
+
+### Favorite Slider
+```
+Horizontal scroll, scroll-snap, 88px cards, avatar with wellness ring, first name, room·bed
+```
+
+### Screen Layout (Room Board)
+```
+Unit context bar → ★ My Residents slider → Rooms (smart-collapsible cards) → Bottom nav with contextual FAB
+```
+No search bar on the Room Board. The nurse knows her unit — search belongs in Discover (global, cross-unit). Every pixel on this screen serves triage, not lookup.
+
+### Dual Contextual Actions
+Two tiers of intelligent actions, both contextual to the current situation:
+
+**Primary — Floating Action Pill** (above the nav bar):
+Full-width pill, prominent, full text label. The highest-priority action right now.
+- **Rounding pending** → orange "START ROUNDING" with play icon.
+- **Rounding in progress** → "CONTINUE ROUNDING" with progress.
+- **No rounding needed** → "QUICK NOTE" in brand color, or hides entirely.
+
+**Secondary — FAB circle** (in the nav bar, between last nav item and Menu):
+Small elevated circle, contextual shortcut for the second-most important action.
+- Default → "Note" (quick observation).
+- During alert → "Alert" (escalate).
+- Future: "Call", "Photo", or any relevant secondary action.
+
+Separation of concerns: the pill is THE action (what you should do next), the FAB is a shortcut (what you might also need). Navigation is navigation — no actions embedded in nav items.
+
+## Future Intelligence Hooks
+
+The architecture is ready for:
+- **Smart ordering**: rooms sorted by urgency (alerts first, overdue next, pending, visited last)
+- **Trend detection**: auto-expand when a resident's wellness changes direction
+- **Activity awareness**: badge showing pending care activities per room
+- **Shift handoff**: highlight rooms with notes from previous shift
+- **Proactive alerts**: "Room 204 hasn't been visited in 90min, Robert's wellness dropped"
+
+## Anti-Patterns to Avoid
+
+- Flat lists of all residents without spatial grouping (room context matters)
+- Repeating unit/floor on every card (one top-level context bar is enough)
+- Equal visual weight for all items (calm and alert rooms should look different)
+- Requiring taps to discover problems (alerts must be visible on first render)
+- Grids that break viewport width on mobile (prefer horizontal scroll or single-column)
+- Search bars on contextual screens (the nurse knows her unit; search is a Discover concern, not a Room Board concern)

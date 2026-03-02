@@ -1,12 +1,9 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../../../../store";
 import { useResidents } from "../../hooks/useResidents";
-import { SearchBar } from "../../components/ui/SearchBar";
-import { MyResidentsSectionTitle } from "../../components/ui/titles/MyResidentsSectionTitle";
-import { RoundingButton } from "../../components/ui/RoundingButton";
 import { FavoriteResidentSlider } from "../../components/residents/FavoriteResidentSlider";
 import { RoomCard } from "../../components/residents/RoomCard";
+import { FloatingActionPill } from "../../components/navigation/FloatingActionPill";
 import { BottomNavigationEnhanced } from "../../components/navigation/BottomNavigationEnhanced";
 import { HomeIndicator } from "../../components/navigation/HomeIndicator";
 import { ScreenLayout } from "../../components/layout/ScreenLayout";
@@ -18,10 +15,9 @@ import { theme } from "../../design-system";
 const CURRENT_UNIT = "2nd Floor · Memory Care & AL";
 
 export default function ResidentsScreen() {
-  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const { residents, myResidents, roomGroups, isLoading, isError, error, refetch } = useResidents(search);
+  const { residents, myResidents, roomGroups, isLoading, isError, error, refetch } = useResidents();
   const setSelectedResidentId = useAppStore((s) => s.setSelectedResidentId);
   const totalAlerts = residents.filter((r) => r.wellness?.trend === "Low").length;
 
@@ -118,16 +114,28 @@ export default function ResidentsScreen() {
               </div>
             </div>
 
-            <SearchBar value={search} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)} />
-
-            <MyResidentsSectionTitle />
-            <RoundingButton />
-
+            {/* My Residents */}
             {myResidents.length > 0 && (
-              <FavoriteResidentSlider
-                residents={myResidents}
-                onResidentClick={handleResidentClick}
-              />
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px 6px" }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill={theme.colors.primary[500]} stroke="none">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                  <span
+                    style={{
+                      fontSize: theme.typography.fontSize.sm,
+                      fontWeight: theme.typography.fontWeight.bold,
+                      color: theme.colors.text.primary,
+                    }}
+                  >
+                    My Residents
+                  </span>
+                </div>
+                <FavoriteResidentSlider
+                  residents={myResidents}
+                  onResidentClick={handleResidentClick}
+                />
+              </div>
             )}
 
             {/* Rooms */}
@@ -174,15 +182,11 @@ export default function ResidentsScreen() {
               </div>
             )}
 
-            {residents.length === 0 && search && (
-              <div style={{ padding: theme.spacing.xxl, textAlign: "center", color: theme.colors.text.secondary }}>
-                No residents found matching "{search}"
-              </div>
-            )}
           </div>
         </PullToRefresh>
       </div>
 
+      <FloatingActionPill action="rounding" onPress={() => console.log("Start rounding")} />
       <BottomNavigationEnhanced />
       <HomeIndicator />
     </ScreenLayout>

@@ -37,10 +37,14 @@ export interface Resident {
   starred?: boolean;
 }
 
+export type RoundingStatus = "visited" | "pending" | "overdue";
+
 export interface RoomGroup {
   room: string;
   unit: string;
   residents: Resident[];
+  roundingStatus: RoundingStatus;
+  lastVisitedMinutesAgo?: number;
 }
 
 // Tipos para componentes

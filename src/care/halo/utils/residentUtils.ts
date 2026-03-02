@@ -2,7 +2,7 @@
  * Resident utilities - color extraction, normalization, and room grouping
  */
 
-import type { Resident, RoomGroup } from "../types/resident.types";
+import type { Resident, RoomGroup, RoundingStatus } from "../types/resident.types";
 
 const DEFAULT_AVATAR_COLORS = ["#8B4A5E", "#A0586A", "#D4A0B0"];
 
@@ -26,9 +26,16 @@ export function withResidentColors<T extends { avatarGradient?: string; colors?:
 }
 
 /**
- * Group residents by room number, preserving order of first appearance.
- * Returns array of RoomGroup sorted by room number.
+ * Mock rounding data -- in production this comes from CV + schedule backend.
+ * Maps room number to { status, lastVisitedMinutesAgo }.
  */
+const MOCK_ROUNDING: Record<string, { status: RoundingStatus; minutesAgo?: number }> = {
+  "201": { status: "visited", minutesAgo: 22 },
+  "202": { status: "pending" },
+  "203": { status: "visited", minutesAgo: 45 },
+  "204": { status: "overdue", minutesAgo: 95 },
+};
+
 export function groupResidentsByRoom(residents: Resident[]): RoomGroup[] {
   const map = new Map<string, RoomGroup>();
 
@@ -37,7 +44,14 @@ export function groupResidentsByRoom(residents: Resident[]): RoomGroup[] {
     if (existing) {
       existing.residents.push(r);
     } else {
-      map.set(r.room, { room: r.room, unit: r.unit, residents: [r] });
+      const rounding = MOCK_ROUNDING[r.room];
+      map.set(r.room, {
+        room: r.room,
+        unit: r.unit,
+        residents: [r],
+        roundingStatus: rounding?.status ?? "pending",
+        lastVisitedMinutesAgo: rounding?.minutesAgo,
+      });
     }
   }
 
