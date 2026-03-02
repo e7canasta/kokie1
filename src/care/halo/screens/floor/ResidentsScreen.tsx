@@ -10,9 +10,19 @@ import { ScreenLayout } from "../../components/layout/ScreenLayout";
 import { LoadingState } from "../../components/ui/LoadingState";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { PullToRefresh } from "../../components/ui/PullToRefresh";
+import { AnimateOnScroll } from "../../components/ui/AnimateOnScroll";
 import { theme } from "../../design-system";
 
 const CURRENT_UNIT = "2nd Floor · Memory Care & AL";
+
+const stickyBar: React.CSSProperties = {
+  position: "sticky",
+  top: 0,
+  zIndex: 20,
+  background: theme.colors.background.secondary,
+  backdropFilter: "blur(12px)",
+  WebkitBackdropFilter: "blur(12px)",
+};
 
 export default function ResidentsScreen() {
   const navigate = useNavigate();
@@ -52,13 +62,16 @@ export default function ResidentsScreen() {
         <PullToRefresh onRefresh={async () => { await refetch(); }}>
           <div style={{ paddingBottom: theme.spacing.md, maxWidth: "100%" }}>
 
-            {/* Unit/Floor context bar */}
+            {/* Unit/Floor context bar — sticky */}
             <div
               style={{
+                ...stickyBar,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                padding: "12px 18px 4px",
+                padding: "10px 18px 8px",
+                borderBottom: `1px solid transparent`,
+                transition: "border-color 0.2s ease",
               }}
             >
               <button
@@ -141,8 +154,11 @@ export default function ResidentsScreen() {
             {/* Rooms */}
             {roomGroups.length > 0 && (
               <div style={{ padding: `4px ${theme.spacing.md} 0` }}>
+                {/* Rooms header — sticky below unit bar */}
                 <div
                   style={{
+                    ...stickyBar,
+                    top: 42,
                     padding: "6px 2px 8px",
                     display: "flex",
                     alignItems: "baseline",
@@ -171,12 +187,13 @@ export default function ResidentsScreen() {
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {roomGroups.map((group) => (
-                    <RoomCard
-                      key={group.room}
-                      group={group}
-                      onResidentClick={handleResidentClick}
-                    />
+                  {roomGroups.map((group, i) => (
+                    <AnimateOnScroll key={group.room} delay={i * 60}>
+                      <RoomCard
+                        group={group}
+                        onResidentClick={handleResidentClick}
+                      />
+                    </AnimateOnScroll>
                   ))}
                 </div>
               </div>
