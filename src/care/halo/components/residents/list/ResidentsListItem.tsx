@@ -14,18 +14,18 @@ export function ResidentsListItem(props: ResidentsListItemProps) {
         }}>
             <div style={{flex: 1}}>
                     <span style={{
-                        fontSize: 13.5,
+                        fontSize: 16, // Aumentado de 13.5px a 16px
                         fontWeight: 700,
                         color: "#1A1A1A",
                         display: "block",
-                        lineHeight: 1.2,
+                        lineHeight: 1.4, // Mejor spacing
                     }}>{props.resident.name}</span>
                 <span style={{
-                    fontSize: 11.5,
-                    color: "#888",
-                    fontWeight: 400,
+                    fontSize: 14, // Aumentado de 11.5px a 14px (mínimo legible)
+                    color: "#666", // Mejor contraste
+                    fontWeight: 500, // Medium para mejor legibilidad
                     display: "block",
-                    marginTop: 2,
+                    marginTop: 3, // Más espacio
                 }}>{props.resident.room}</span>
             </div>
             <div style={{flexShrink: 0, cursor: "pointer"}}>

@@ -16,10 +16,11 @@ export function TopCareCard() {
     return (
         <div style={{padding: "24px 20px 0"}}>
             <h2 style={{
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: 700,
                 color: "#1A1A1A",
-                margin: "0 0 14px 0",
+                margin: "0 0 16px 0",
+                letterSpacing: "-0.01em",
             }}>Top Care Activities</h2>
 
             <TimeRangeTabs tabs={timeRangeTabs} activeTab={activeTab} onTabChange={setActiveTab}/>
@@ -69,8 +70,8 @@ function TimeRangeTabs({tabs, activeTab, onTabChange}: TimeRangeTabsProps) {
                         padding: "9px 0",
                         border: "none",
                         borderRadius: 22,
-                        fontSize: 12.5,
-                        fontWeight: activeTab === tab ? 600 : 500,
+                        fontSize: 14,
+                        fontWeight: activeTab === tab ? 700 : 600,
                         cursor: "pointer",
                         background: activeTab === tab ? "#FFFFFF" : "transparent",
                         color: activeTab === tab ? "#1A1A1A" : "#888",
@@ -92,10 +93,10 @@ function TableHeader() {
             gridTemplateColumns: "1.2fr 1fr 1fr 0.8fr",
             padding: "0 0 10px 0",
         }}>
-            <span style={{fontSize: 13, fontWeight: 700, color: "#333"}}>Activity</span>
-            <span style={{fontSize: 13, fontWeight: 700, color: "#333"}}>Initiated</span>
-            <span style={{fontSize: 13, fontWeight: 700, color: "#333"}}>Uninitiated</span>
-            <span style={{fontSize: 13, fontWeight: 700, color: "#333", textAlign: "right"}}>Total</span>
+            <span style={{fontSize: 14, fontWeight: 700, color: "#1A1A1A"}}>Activity</span>
+            <span style={{fontSize: 14, fontWeight: 700, color: "#1A1A1A"}}>Initiated</span>
+            <span style={{fontSize: 14, fontWeight: 700, color: "#1A1A1A"}}>Uninitiated</span>
+            <span style={{fontSize: 14, fontWeight: 700, color: "#1A1A1A", textAlign: "right"}}>Total</span>
         </div>
     );
 }
@@ -109,10 +110,10 @@ function ActivityRow({item, isLast}: ActivityRowProps) {
                 padding: "13px 0",
                 alignItems: "center",
             }}>
-                <span style={{fontSize: 14, color: "#333", fontWeight: 500}}>{item.activity}</span>
-                <span style={{fontSize: 14, color: "#555"}}>{item.initiated}</span>
-                <span style={{fontSize: 14, color: "#555"}}>{item.uninitiated}</span>
-                <span style={{fontSize: 14, color: "#333", fontWeight: 600, textAlign: "right"}}>{item.total}</span>
+                <span style={{fontSize: 15, color: "#1A1A1A", fontWeight: 600}}>{item.activity}</span>
+                <span style={{fontSize: 15, color: "#666", fontWeight: 500}}>{item.initiated}</span>
+                <span style={{fontSize: 15, color: "#666", fontWeight: 500}}>{item.uninitiated}</span>
+                <span style={{fontSize: 15, color: "#1A1A1A", fontWeight: 700, textAlign: "right"}}>{item.total}</span>
             </div>
             {!isLast && <div style={{height: 1, background: "#F0F0F0"}}/>}
         </div>

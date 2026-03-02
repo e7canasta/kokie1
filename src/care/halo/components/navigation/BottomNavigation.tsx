@@ -31,7 +31,7 @@ export function BottomNavigation() {
                 minWidth: 48,
             }}>
                 <HomeIcon/>
-                <span style={{fontSize: 9, fontWeight: 400}}>Events</span>
+                <span style={{fontSize: 11, fontWeight: 500}}>Events</span>
             </button>
 
             {/* Discover */}
@@ -79,7 +79,7 @@ export function BottomNavigation() {
                     <ResidentsNavIcon/>
                 </div>
                 <div style={{height: 26}}/>
-                <span style={{fontSize: 9, fontWeight: 600}}>Residents</span>
+                <span style={{fontSize: 11, fontWeight: 600}}>Residents</span>
             </button>
 
             {/* Menu */}

@@ -24,11 +24,12 @@ export function SearchBar(props: SearchBarProps) {
                     style={{
                         border: "none",
                         outline: "none",
-                        fontSize: 13,
-                        color: "#333",
+                        fontSize: 15, // Aumentado de 13px a 15px
+                        color: "#1A1A1A", // Mejor contraste
                         background: "transparent",
                         width: "100%",
                         fontFamily: "inherit",
+                        fontWeight: 500,
                     }}
                 />
             </div>

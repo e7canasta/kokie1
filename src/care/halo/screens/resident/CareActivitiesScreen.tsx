@@ -93,11 +93,12 @@ export default function CareActivitiesScreen() {
                     <ChevronLeftIcon />
                 </button>
                 <h1 style={{
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: 700,
                     color: "#1A1A1A",
                     margin: 0,
                     flex: 1,
+                    letterSpacing: "-0.02em",
                 }}>
                     Care Activities
                 </h1>
@@ -129,8 +130,8 @@ export default function CareActivitiesScreen() {
                                 padding: "10px 0",
                                 border: "none",
                                 borderRadius: 22,
-                                fontSize: 13,
-                                fontWeight: activeTab === tab ? 600 : 500,
+                                fontSize: 14,
+                                fontWeight: activeTab === tab ? 700 : 600,
                                 cursor: "pointer",
                                 background: activeTab === tab ? "#FFFFFF" : "transparent",
                                 color: activeTab === tab ? "#1A1A1A" : "#888",
@@ -152,9 +153,10 @@ export default function CareActivitiesScreen() {
                     color: "#FFFFFF",
                 }}>
                     <div style={{
-                        fontSize: 13,
-                        opacity: 0.9,
-                        marginBottom: 8,
+                        fontSize: 14,
+                        opacity: 0.95,
+                        marginBottom: 10,
+                        fontWeight: 600,
                     }}>
                         Total Time - {activeTab}
                     </div>
@@ -165,20 +167,20 @@ export default function CareActivitiesScreen() {
                         marginTop: 12,
                     }}>
                         <div>
-                            <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 4 }}>Initiated</div>
-                            <div style={{ fontSize: 18, fontWeight: 700 }}>
+                            <div style={{ fontSize: 12, opacity: 0.9, marginBottom: 6, fontWeight: 500 }}>Initiated</div>
+                            <div style={{ fontSize: 20, fontWeight: 700 }}>
                                 {formatTime(totals.initiated)}
                             </div>
                         </div>
                         <div>
-                            <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 4 }}>Uninitiated</div>
-                            <div style={{ fontSize: 18, fontWeight: 700 }}>
+                            <div style={{ fontSize: 12, opacity: 0.9, marginBottom: 6, fontWeight: 500 }}>Uninitiated</div>
+                            <div style={{ fontSize: 20, fontWeight: 700 }}>
                                 {formatTime(totals.uninitiated)}
                             </div>
                         </div>
                         <div>
-                            <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 4 }}>Total</div>
-                            <div style={{ fontSize: 18, fontWeight: 700 }}>
+                            <div style={{ fontSize: 12, opacity: 0.9, marginBottom: 6, fontWeight: 500 }}>Total</div>
+                            <div style={{ fontSize: 20, fontWeight: 700 }}>
                                 {formatTime(totals.total)}
                             </div>
                         </div>
@@ -222,16 +224,17 @@ export default function CareActivitiesScreen() {
                                 }}>
                                     <div style={{ flex: 1 }}>
                                         <div style={{
-                                            fontSize: 16,
+                                            fontSize: 17,
                                             fontWeight: 700,
                                             color: "#1A1A1A",
-                                            marginBottom: 4,
+                                            marginBottom: 6,
+                                            letterSpacing: "-0.01em",
                                         }}>
                                             {activity.activity}
                                         </div>
                                         <div style={{
-                                            fontSize: 14,
-                                            fontWeight: 600,
+                                            fontSize: 16,
+                                            fontWeight: 700,
                                             color: "#2E7D6F",
                                         }}>
                                             {activity.total}
@@ -288,14 +291,15 @@ export default function CareActivitiesScreen() {
                                                 borderRadius: 12,
                                             }}>
                                                 <div style={{
-                                                    fontSize: 11,
+                                                    fontSize: 13,
                                                     color: "#666",
-                                                    marginBottom: 4,
+                                                    marginBottom: 6,
+                                                    fontWeight: 600,
                                                 }}>
                                                     Initiated
                                                 </div>
                                                 <div style={{
-                                                    fontSize: 18,
+                                                    fontSize: 20,
                                                     fontWeight: 700,
                                                     color: "#2E7D6F",
                                                 }}>
@@ -308,16 +312,17 @@ export default function CareActivitiesScreen() {
                                                 borderRadius: 12,
                                             }}>
                                                 <div style={{
-                                                    fontSize: 11,
+                                                    fontSize: 13,
                                                     color: "#666",
-                                                    marginBottom: 4,
+                                                    marginBottom: 6,
+                                                    fontWeight: 600,
                                                 }}>
                                                     Uninitiated
                                                 </div>
                                                 <div style={{
-                                                    fontSize: 18,
+                                                    fontSize: 20,
                                                     fontWeight: 700,
-                                                    color: "#888",
+                                                    color: "#666",
                                                 }}>
                                                     {activity.uninitiated}
                                                 </div>
@@ -330,14 +335,15 @@ export default function CareActivitiesScreen() {
                                             borderRadius: 12,
                                         }}>
                                             <div style={{
-                                                fontSize: 11,
+                                                fontSize: 13,
                                                 color: "#666",
-                                                marginBottom: 4,
+                                                marginBottom: 6,
+                                                fontWeight: 600,
                                             }}>
                                                 Total Time
                                             </div>
                                             <div style={{
-                                                fontSize: 20,
+                                                fontSize: 22,
                                                 fontWeight: 700,
                                                 color: "#1B5E50",
                                             }}>

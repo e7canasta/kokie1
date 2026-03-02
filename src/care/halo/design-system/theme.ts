@@ -84,15 +84,18 @@ export const theme = {
       primary: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       mono: "'SF Mono', 'Monaco', 'Menlo', monospace",
     },
+    // Mobile-first font sizes optimized for healthcare workers
+    // Minimum 14px for body text (WCAG AA, readable at arm's length)
     fontSize: {
-      xs: "11px",
-      sm: "12px",
-      base: "13px",
-      md: "14px",
-      lg: "16px",
-      xl: "18px",
-      "2xl": "20px",
-      "3xl": "24px",
+      xs: "12px",      // Labels secundarios, metadata (antes 11px)
+      sm: "14px",      // Body text mínimo, información secundaria (antes 12px)
+      base: "15px",    // Body text estándar, fácil de leer (antes 13px)
+      md: "16px",      // Texto importante, cards (antes 14px)
+      lg: "18px",      // Subtítulos, valores importantes (antes 16px)
+      xl: "20px",      // Títulos de sección (antes 18px)
+      "2xl": "24px",   // Títulos principales (antes 20px)
+      "3xl": "28px",   // Títulos hero (antes 24px)
+      "4xl": "32px",   // Títulos muy grandes (nuevo)
     },
     fontWeight: {
       normal: 400,
@@ -102,9 +105,16 @@ export const theme = {
       heavy: 750,
     },
     lineHeight: {
-      tight: 1.2,
-      normal: 1.4,
-      relaxed: 1.6,
+      tight: 1.3,      // Ajustado para mejor legibilidad (antes 1.2)
+      normal: 1.5,    // Mejor spacing para lectura rápida (antes 1.4)
+      relaxed: 1.7,   // Para párrafos largos (antes 1.6)
+    },
+    // Letter spacing para mejor legibilidad
+    letterSpacing: {
+      tight: "-0.01em",
+      normal: "0",
+      wide: "0.02em",
+      wider: "0.05em",
     },
   },
   

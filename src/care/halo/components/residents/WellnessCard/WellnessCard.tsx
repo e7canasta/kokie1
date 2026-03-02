@@ -40,15 +40,15 @@ function WellnessHeader({trend, previousTrend}: WellnessHeaderProps) {
                 color: "#2E7D6F",
             }}>Wellness</span>
             <div style={{textAlign: "center"}}>
-                <span style={{fontSize: 11, color: "#999", display: "block", lineHeight: 1.2}}>7 day avg</span>
-                <span style={{display: "flex", alignItems: "center", justifyContent: "center", gap: 3, marginTop: 2}}>
+                <span style={{fontSize: 12, color: "#666", display: "block", lineHeight: 1.3, fontWeight: 500}}>7 day avg</span>
+                <span style={{display: "flex", alignItems: "center", justifyContent: "center", gap: 4, marginTop: 4}}>
                     <UpArrowIcon/>
-                    <span style={{fontSize: 15, fontWeight: 600, color: "#333"}}>{trend}</span>
+                    <span style={{fontSize: 17, fontWeight: 700, color: "#1A1A1A"}}>{trend}</span>
                 </span>
             </div>
             <div style={{textAlign: "right"}}>
-                <span style={{fontSize: 11, color: "#999", display: "block", lineHeight: 1.2}}>Last 30 days</span>
-                <span style={{fontSize: 15, fontWeight: 600, color: "#333", display: "block", marginTop: 2}}>{previousTrend}</span>
+                <span style={{fontSize: 12, color: "#666", display: "block", lineHeight: 1.3, fontWeight: 500}}>Last 30 days</span>
+                <span style={{fontSize: 17, fontWeight: 700, color: "#1A1A1A", display: "block", marginTop: 4}}>{previousTrend}</span>
             </div>
         </div>
     );
@@ -71,12 +71,12 @@ function WellnessRow({item, isLast}: WellnessRowProps) {
                 padding: "12px 16px",
                 alignItems: "center",
             }}>
-                <span style={{fontSize: 14, fontWeight: 600, color: "#333"}}>{item.label}</span>
+                <span style={{fontSize: 15, fontWeight: 600, color: "#1A1A1A"}}>{item.label}</span>
                 <span style={{display: "flex", alignItems: "center", justifyContent: "center", gap: 4}}>
                     {item.hasArrow && <UpArrowIcon/>}
-                    <span style={{fontSize: 14, color: "#333"}}>{item.current || item.value || "-"}</span>
+                    <span style={{fontSize: 15, fontWeight: 600, color: "#1A1A1A"}}>{item.current || item.value || "-"}</span>
                 </span>
-                <span style={{fontSize: 14, color: "#333", textAlign: "right"}}>{previousValue}</span>
+                <span style={{fontSize: 15, fontWeight: 500, color: "#666", textAlign: "right"}}>{previousValue}</span>
             </div>
             {!isLast && <div style={{height: 1, background: "#ECECEC", margin: "0 16px"}}/>}
         </div>

@@ -29,24 +29,26 @@ export function ResidentHeader({resident, onBack}: ResidentHeaderProps) {
 
             <div style={{flex: 1}}>
                 <h1 style={{
-                    fontSize: 20,
+                    fontSize: 22, // Aumentado de 20px a 22px
                     fontWeight: 700,
                     color: "#1A1A1A",
                     margin: 0,
-                    lineHeight: 1.2,
-                    letterSpacing: "-0.3px",
+                    lineHeight: 1.3, // Mejor spacing
+                    letterSpacing: "-0.02em",
                 }}>{resident.name}</h1>
                 <p style={{
-                    fontSize: 13,
+                    fontSize: 14, // Aumentado de 13px a 14px
                     color: "#666",
-                    margin: "2px 0 0 0",
-                    lineHeight: 1.3,
+                    margin: "4px 0 0 0", // Más espacio
+                    lineHeight: 1.4,
+                    fontWeight: 500,
                 }}>DOB: {resident.dob}</p>
                 <p style={{
-                    fontSize: 13,
+                    fontSize: 14, // Aumentado de 13px a 14px
                     color: "#666",
-                    margin: "1px 0 0 0",
-                    lineHeight: 1.3,
+                    margin: "2px 0 0 0",
+                    lineHeight: 1.4,
+                    fontWeight: 500,
                 }}>Room {resident.room} | Unit: {resident.unit}</p>
             </div>
 
