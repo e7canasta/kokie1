@@ -27,4 +27,5 @@ dist-ssr
 *.sw?
 
 /.obsidian/
+/.obsidian/workspace.json
 /.obsidian/**
