@@ -10,6 +10,8 @@ export function ResidentsGrid(props: ResidentsGridProps) {
         gridTemplateColumns: "1fr 1fr",
         gap: "10px",
         padding: `0 ${theme.spacing.md} 6px`,
+        overflow: "hidden",
+        minWidth: 0,
       }}
     >
       {residents.map(props.renderItem)}

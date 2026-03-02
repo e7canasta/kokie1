@@ -8,69 +8,82 @@ const WELLNESS_COLORS: Record<string, string> = {
   Low: theme.colors.error,
 };
 
+const WELLNESS_LABELS: Record<string, string> = {
+  High: "Stable",
+  Medium: "Monitor",
+  Low: "Attention",
+};
+
 interface RoomCardProps {
   group: RoomGroup;
   onResidentClick: (id: number) => void;
 }
 
 export function RoomCard({ group, onResidentClick }: RoomCardProps) {
+  const lowCount = group.residents.filter((r) => r.wellness?.trend === "Low").length;
+
   return (
     <div
       style={{
         background: theme.colors.background.primary,
-        borderRadius: theme.borderRadius.md,
+        borderRadius: theme.borderRadius.sm,
         border: `1px solid ${theme.colors.border.light}`,
         overflow: "hidden",
       }}
     >
-      {/* Room header */}
+      {/* Compact room header */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "10px 14px",
+          padding: "7px 12px",
           background: theme.colors.primary[50],
           borderBottom: `1px solid ${theme.colors.border.light}`,
         }}
       >
-        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-          <span
-            style={{
-              fontSize: theme.typography.fontSize.base,
-              fontWeight: theme.typography.fontWeight.bold,
-              color: theme.colors.primary[600],
-            }}
-          >
-            Room {group.room}
-          </span>
-          <span
-            style={{
-              fontSize: theme.typography.fontSize.xs,
-              fontWeight: theme.typography.fontWeight.medium,
-              color: theme.colors.text.secondary,
-            }}
-          >
-            {group.unit}
-          </span>
-        </div>
         <span
           style={{
-            fontSize: theme.typography.fontSize.xs,
-            fontWeight: theme.typography.fontWeight.semibold,
-            color: theme.colors.text.tertiary,
+            fontSize: theme.typography.fontSize.sm,
+            fontWeight: theme.typography.fontWeight.bold,
+            color: theme.colors.primary[700],
           }}
         >
-          {group.residents.length} {group.residents.length === 1 ? "bed" : "beds"}
+          Room {group.room}
         </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {lowCount > 0 && (
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: theme.typography.fontWeight.bold,
+                color: theme.colors.text.inverse,
+                background: theme.colors.error,
+                borderRadius: theme.borderRadius.full,
+                padding: "1px 6px",
+                lineHeight: "1.5",
+              }}
+            >
+              {lowCount}
+            </span>
+          )}
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: theme.typography.fontWeight.medium,
+              color: theme.colors.text.tertiary,
+            }}
+          >
+            {group.residents.length}/4
+          </span>
+        </div>
       </div>
 
       {/* Residents 2-col grid */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: group.residents.length === 1 ? "1fr" : "1fr 1fr",
-          gap: 0,
+          gridTemplateColumns: "1fr 1fr",
         }}
       >
         {group.residents.map((resident, i) => (
@@ -78,8 +91,10 @@ export function RoomCard({ group, onResidentClick }: RoomCardProps) {
             key={resident.id}
             resident={resident}
             onClick={() => onResidentClick(resident.id)}
-            showRightBorder={group.residents.length > 1 && i % 2 === 0}
-            showBottomBorder={i < group.residents.length - 2}
+            isLeftCol={i % 2 === 0}
+            isTopRow={i < 2}
+            totalCount={group.residents.length}
+            index={i}
           />
         ))}
       </div>
@@ -90,12 +105,19 @@ export function RoomCard({ group, onResidentClick }: RoomCardProps) {
 interface ResidentCellProps {
   resident: Resident;
   onClick: () => void;
-  showRightBorder: boolean;
-  showBottomBorder: boolean;
+  isLeftCol: boolean;
+  isTopRow: boolean;
+  totalCount: number;
+  index: number;
 }
 
-function ResidentCell({ resident, onClick, showRightBorder, showBottomBorder }: ResidentCellProps) {
-  const wellnessColor = WELLNESS_COLORS[resident.wellness?.trend] ?? theme.colors.neutral[400];
+function ResidentCell({ resident, onClick, isLeftCol, isTopRow, totalCount, index }: ResidentCellProps) {
+  const wellnessTrend = resident.wellness?.trend ?? "Medium";
+  const wellnessColor = WELLNESS_COLORS[wellnessTrend] ?? theme.colors.neutral[400];
+  const wellnessLabel = WELLNESS_LABELS[wellnessTrend] ?? "";
+  const hasBottomRow = totalCount > 2;
+  const showBottomBorder = isTopRow && hasBottomRow;
+  const showRightBorder = isLeftCol && (index + 1 < totalCount);
 
   return (
     <div
@@ -103,18 +125,16 @@ function ResidentCell({ resident, onClick, showRightBorder, showBottomBorder }: 
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 10,
-        padding: "12px 14px",
+        gap: 8,
+        padding: "8px 10px",
         cursor: "pointer",
         borderRight: showRightBorder ? `1px solid ${theme.colors.border.light}` : "none",
         borderBottom: showBottomBorder ? `1px solid ${theme.colors.border.light}` : "none",
-        minHeight: 56,
         boxSizing: "border-box",
       }}
     >
       <div style={{ position: "relative", flexShrink: 0 }}>
-        <Avatar name={resident.name} size={36} colors={resident.colors ?? []} />
-        {/* Wellness dot */}
+        <Avatar name={resident.name} size={34} colors={resident.colors ?? []} />
         <div
           style={{
             position: "absolute",
@@ -131,11 +151,11 @@ function ResidentCell({ resident, onClick, showRightBorder, showBottomBorder }: 
       <div style={{ minWidth: 0, flex: 1 }}>
         <span
           style={{
-            fontSize: theme.typography.fontSize.sm,
+            fontSize: 13,
             fontWeight: theme.typography.fontWeight.semibold,
             color: theme.colors.text.primary,
             display: "block",
-            lineHeight: theme.typography.lineHeight.tight,
+            lineHeight: 1.2,
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
@@ -143,19 +163,17 @@ function ResidentCell({ resident, onClick, showRightBorder, showBottomBorder }: 
         >
           {resident.name}
         </span>
-        {resident.bed && (
-          <span
-            style={{
-              fontSize: theme.typography.fontSize.xs,
-              fontWeight: theme.typography.fontWeight.medium,
-              color: theme.colors.text.tertiary,
-              display: "block",
-              marginTop: 2,
-            }}
-          >
-            Bed {resident.bed}
-          </span>
-        )}
+        <span
+          style={{
+            fontSize: 10.5,
+            fontWeight: theme.typography.fontWeight.medium,
+            color: wellnessTrend === "Low" ? wellnessColor : theme.colors.text.tertiary,
+            display: "block",
+            marginTop: 2,
+          }}
+        >
+          {resident.bed} · {wellnessLabel}
+        </span>
       </div>
     </div>
   );

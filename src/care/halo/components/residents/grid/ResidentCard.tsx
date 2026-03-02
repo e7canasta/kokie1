@@ -14,6 +14,8 @@ export function ResidentCard(props: ResidentCardProps) {
         borderRadius: theme.borderRadius.md,
         border: `1px solid ${theme.colors.border.light}`,
         cursor: "pointer",
+        minWidth: 0,
+        overflow: "hidden",
       }}
     >
       <Avatar name={props.resident.name} size={44} colors={props.resident.colors} />

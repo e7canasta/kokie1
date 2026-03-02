@@ -33,18 +33,19 @@ export function ScreenLayout({
           {header}
         </div>
       )}
-      
+
       <main style={{
         flex: 1,
         minHeight: 0,
-        overflow: "hidden",
+        overflowX: "hidden",
+        overflowY: "hidden",
         display: "flex",
         flexDirection: "column",
         padding: padding || 0,
       }}>
         {children}
       </main>
-      
+
       {footer && (
         <div style={{ flexShrink: 0 }}>
           {footer}

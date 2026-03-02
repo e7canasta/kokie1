@@ -76,7 +76,8 @@ export function PullToRefresh({
       style={{
         position: "relative",
         height: "100%",
-        overflow: "auto",
+        overflowY: "auto",
+        overflowX: "hidden",
         WebkitOverflowScrolling: "touch",
       }}
     >

@@ -6,62 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>v6</title>
       <style>
-        /* Contenido de fondo para que veas el efecto */
-        body { margin: 0; padding: 0px; font-family: sans-serif; background: #222; color: white; }
-
-        /* Botón Overlay Traslúcido */
-        #btnFullScreen {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999; /* Siempre arriba */
-            padding: 10px 15px;
-            font-size: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            background-color: rgba(255, 255, 255, 0.1); /* Traslúcido */
-            color: rgba(255, 255, 255, 0.7);
-            cursor: pointer;
-            backdrop-filter: blur(5px); /* Efecto cristal */
-            transition: all 0.3s ease;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
         }
-
-        /* Efecto al pasar el mouse */
-        #btnFullScreen:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-color: rgba(255, 255, 255, 0.6);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #F6F5F3;
+        }
+        #root {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-        <!-- Botón Overlay -->
-    <button id="btnFullScreen">⛶ Fullscreen</button>
-
-    <script>
-        const btn = document.getElementById('btnFullScreen');
-
-        btn.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                // Entrar a pantalla completa
-                const docElm = document.documentElement;
-                if (docElm.requestFullscreen) docElm.requestFullscreen();
-                else if (docElm.webkitRequestFullscreen) docElm.webkitRequestFullscreen();
-                else if (docElm.msRequestFullscreen) docElm.msRequestFullscreen();
-            } else {
-                // Salir de pantalla completa si ya está dentro
-                if (document.exitFullscreen) document.exitFullscreen();
-            }
-        });
-
-        // Actualizar el texto del botón según el estado
-        document.addEventListener('fullscreenchange', () => {
-            btn.textContent = document.fullscreenElement ? '✕ Salir' : '⛶ Fullscreen';
-            // Hacerlo aún más traslúcido en modo full para que no moleste
-            btn.style.opacity = document.fullscreenElement ? "0.4" : "1";
-        });
-    </script>
   </body>
 </html>

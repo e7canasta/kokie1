@@ -9,8 +9,9 @@ export const commonStyles = {
   // Layout utilities
   container: {
     width: "100%",
-    maxWidth: "100vw",
+    maxWidth: "100%",
     margin: "0 auto",
+    overflowX: "hidden" as const,
   },
   
   flexCenter: {
@@ -65,15 +66,14 @@ export const commonStyles = {
     fontFamily: theme.typography.fontFamily.primary,
   },
   
-  // Screen container - height 100vh so flex children (e.g. bottom nav) stay at viewport bottom
   screenContainer: {
     fontFamily: theme.typography.fontFamily.primary,
-    height: "100vh",
-    minHeight: "100vh",
-    maxHeight: "100vh",
+    width: "100%",
+    height: "100%",
+    maxWidth: "100vw",
     background: theme.colors.background.secondary,
     overflow: "hidden",
-    position: "relative",
+    position: "relative" as const,
   },
   
   // Scrollable content
