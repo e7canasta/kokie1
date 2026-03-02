@@ -4,8 +4,9 @@ import { useAppStore } from "../../../../store";
 import { useResidents } from "../../hooks/useResidents";
 import { useRounding } from "../../context/RoundingContext";
 import { usePolling } from "../../hooks/usePolling";
-import { HotResidentsSlider } from "../../components/residents/HotResidentsSlider";
+import { TriageQueue } from "../../components/residents/TriageQueue";
 import { RoomCard } from "../../components/residents/RoomCard";
+import { RoundingCard } from "../../components/rounding/RoundingCard";
 import { FloatingActionPill } from "../../components/navigation/FloatingActionPill";
 import { BottomNavigationEnhanced } from "../../components/navigation/BottomNavigationEnhanced";
 import { HomeIndicator } from "../../components/navigation/HomeIndicator";
@@ -40,8 +41,50 @@ export default function ResidentsScreen() {
   const roomRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Sprint 1 (P0) - Rounding Flow
-  const { state: roundingState, startRounding } = useRounding();
+  const { state: roundingState, startRounding, endRounding, getRoundingProgress } = useRounding();
   const [roundingSheetOpen, setRoundingSheetOpen] = useState(false);
+
+  // Rounding suggestion (mock - future: viene del backend)
+  const roundingSuggestion = useMemo(() => {
+    if (roundingState.isActive) return null; // No mostrar sugerencia si ya hay ronda activa
+
+    // Mock sugerencia basada en la hora actual
+    const now = new Date();
+    const hour = now.getHours();
+    let suggestedType = "General";
+    let scheduledTime = "14:00";
+
+    if (hour >= 6 && hour < 9) {
+      suggestedType = "Medicación";
+      scheduledTime = "08:00";
+    } else if (hour >= 9 && hour < 12) {
+      suggestedType = "Observación";
+      scheduledTime = "10:00";
+    } else if (hour >= 12 && hour < 15) {
+      suggestedType = "Alimentación";
+      scheduledTime = "13:00";
+    } else if (hour >= 15 && hour < 18) {
+      suggestedType = "Observación";
+      scheduledTime = "16:00";
+    } else if (hour >= 18 && hour < 21) {
+      suggestedType = "Vigia";
+      scheduledTime = "20:00";
+    }
+
+    // Calcular cuántas rooms pueden ser virtuales (tienen monitoreo ambiental activo + sin alertas)
+    const virtualPossible = roomGroups.filter(
+      (g) =>
+        g.cvStatus === "active" &&
+        !g.residents.some((r) => r.wellness?.trend === "Low")
+    ).length;
+
+    return {
+      type: suggestedType,
+      scheduledTime,
+      totalRooms: roomGroups.length,
+      virtualPossible,
+    };
+  }, [roundingState.isActive, roomGroups]);
 
   // Sprint 3 (P0) - Real-time updates via polling (30s interval)
   usePolling({
@@ -158,6 +201,32 @@ export default function ResidentsScreen() {
               />
             </div>
 
+            {/* RoundingCard — workflow hub (Sprint 2) */}
+            <RoundingCard
+              suggestion={roundingSuggestion}
+              isActive={roundingState.isActive}
+              progress={
+                roundingState.isActive
+                  ? {
+                      ...getRoundingProgress(),
+                      elapsedMinutes: roundingState.startedAt
+                        ? Math.floor((Date.now() - roundingState.startedAt.getTime()) / 60000)
+                        : 0,
+                    }
+                  : undefined
+              }
+              onViewProgram={() => {
+                // TODO: Navigate to RoundingProgramScreen (Sprint 5)
+                console.log("View program");
+              }}
+              onStart={() => setRoundingSheetOpen(true)}
+              onPause={() => {
+                // TODO: Implementar pause (Sprint 5 - opcional)
+                console.log("Pause rounding");
+              }}
+              onEnd={() => setRoundingSheetOpen(true)}
+            />
+
             {/* Sprint 3 (P2) - CV Metrics */}
             <CVMetrics
               roomsWithCV={commandCenterData.roomsWithCV}
@@ -185,12 +254,12 @@ export default function ResidentsScreen() {
               </span>
             </div>
 
-            {/* Hot Residents — Generative/contextual (Sprint 2 P1) */}
+            {/* Triage Queue — 100% generativo (Sprint 2 P1) */}
             {hotResidents.length > 0 && (
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px 6px" }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill={theme.colors.error} stroke="none">
-                    <path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z" />
+                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
                   </svg>
                   <span
                     style={{
@@ -199,7 +268,7 @@ export default function ResidentsScreen() {
                       color: theme.colors.text.primary,
                     }}
                   >
-                    Hot Residents
+                    REQUIEREN ATENCIÓN
                   </span>
                   <span
                     style={{
@@ -212,7 +281,7 @@ export default function ResidentsScreen() {
                     ({hotResidents.length})
                   </span>
                 </div>
-                <HotResidentsSlider
+                <TriageQueue
                   residents={hotResidents}
                   onResidentClick={handleResidentClick}
                 />
@@ -277,23 +346,38 @@ export default function ResidentsScreen() {
       <FloatingActionPill
         action={roundingState.isActive ? "continue-rounding" : "rounding"}
         onPress={() => setRoundingSheetOpen(true)}
+        visited={roundingState.isActive ? getRoundingProgress().visited : 0}
+        total={roundingState.isActive ? getRoundingProgress().total : 0}
+        percentage={roundingState.isActive ? getRoundingProgress().percentage : 0}
       />
 
-      {/* Rounding Start Bottom Sheet */}
+      {/* Rounding Bottom Sheet (Start or End) */}
       <BottomSheet
         isOpen={roundingSheetOpen}
         onClose={() => setRoundingSheetOpen(false)}
         height="auto"
-        title="Start Rounding"
+        title={roundingState.isActive ? "Finalizar Ronda" : "Start Rounding"}
       >
-        <StartRoundingForm
-          totalRooms={roomGroups.length}
-          onStart={(roundType) => {
-            startRounding(roomGroups.length, roundType);
-            setRoundingSheetOpen(false);
-          }}
-          onCancel={() => setRoundingSheetOpen(false)}
-        />
+        {roundingState.isActive ? (
+          <EndRoundingForm
+            progress={getRoundingProgress()}
+            roundType={roundingState.roundType}
+            onEnd={() => {
+              endRounding();
+              setRoundingSheetOpen(false);
+            }}
+            onCancel={() => setRoundingSheetOpen(false)}
+          />
+        ) : (
+          <StartRoundingForm
+            totalRooms={roomGroups.length}
+            onStart={(roundType) => {
+              startRounding(roomGroups.length, roundType);
+              setRoundingSheetOpen(false);
+            }}
+            onCancel={() => setRoundingSheetOpen(false)}
+          />
+        )}
       </BottomSheet>
 
       <BottomNavigationEnhanced />
@@ -424,6 +508,146 @@ function StartRoundingForm({
           }}
         >
           Start Rounding
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * End Rounding Form
+ * Muestra resumen básico y permite finalizar ronda
+ */
+function EndRoundingForm({
+  progress,
+  roundType,
+  onEnd,
+  onCancel,
+}: {
+  progress: { visited: number; total: number; percentage: number };
+  roundType: string | null;
+  onEnd: () => void;
+  onCancel: () => void;
+}) {
+  const pendingRooms = progress.total - progress.visited;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.lg }}>
+      <div>
+        <p style={{
+          margin: 0,
+          fontSize: theme.typography.fontSize.md,
+          fontWeight: theme.typography.fontWeight.semibold,
+          color: theme.colors.text.primary
+        }}>
+          {roundType || 'Ronda General'}
+        </p>
+        <p style={{
+          margin: `${theme.spacing.xs} 0 0`,
+          fontSize: theme.typography.fontSize.sm,
+          color: theme.colors.text.secondary
+        }}>
+          Progreso actual
+        </p>
+      </div>
+
+      {/* Progress summary */}
+      <div style={{
+        padding: theme.spacing.lg,
+        background: theme.colors.background.secondary,
+        borderRadius: theme.borderRadius.md,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: theme.spacing.md,
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{
+            fontSize: theme.typography.fontSize.sm,
+            color: theme.colors.text.secondary
+          }}>
+            Habitaciones visitadas
+          </span>
+          <span style={{
+            fontSize: theme.typography.fontSize.lg,
+            fontWeight: theme.typography.fontWeight.bold,
+            color: theme.colors.primary[500]
+          }}>
+            {progress.visited}/{progress.total}
+          </span>
+        </div>
+
+        {/* Progress bar */}
+        <div style={{
+          width: '100%',
+          height: 8,
+          background: theme.colors.neutral[200],
+          borderRadius: theme.borderRadius.full,
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            width: `${progress.percentage}%`,
+            height: '100%',
+            background: `linear-gradient(90deg, ${theme.colors.primary[500]}, ${theme.colors.primary[600]})`,
+            borderRadius: theme.borderRadius.full,
+            transition: 'width 0.3s ease',
+          }} />
+        </div>
+
+        <div style={{ fontSize: theme.typography.fontSize.xs, color: theme.colors.text.tertiary }}>
+          {progress.percentage}% completado
+        </div>
+      </div>
+
+      {pendingRooms > 0 && (
+        <div style={{
+          padding: theme.spacing.md,
+          background: `${theme.colors.warning}10`,
+          border: `1px solid ${theme.colors.warning}`,
+          borderRadius: theme.borderRadius.sm,
+        }}>
+          <p style={{
+            margin: 0,
+            fontSize: theme.typography.fontSize.sm,
+            color: theme.colors.text.primary
+          }}>
+            ⚠️ Quedan {pendingRooms} habitacion{pendingRooms > 1 ? 'es' : ''} pendiente{pendingRooms > 1 ? 's' : ''}
+          </p>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: theme.spacing.md }}>
+        <button
+          onClick={onCancel}
+          style={{
+            flex: 1,
+            padding: theme.spacing.md,
+            background: theme.colors.background.secondary,
+            border: `1.5px solid ${theme.colors.border.medium}`,
+            borderRadius: theme.borderRadius.md,
+            fontSize: theme.typography.fontSize.base,
+            fontWeight: theme.typography.fontWeight.semibold,
+            color: theme.colors.text.primary,
+            cursor: 'pointer',
+          }}
+        >
+          Cancelar
+        </button>
+        <button
+          onClick={onEnd}
+          style={{
+            flex: 1,
+            padding: theme.spacing.md,
+            background: `linear-gradient(135deg, ${theme.colors.primary[500]}, ${theme.colors.primary[700]})`,
+            border: 'none',
+            borderRadius: theme.borderRadius.md,
+            fontSize: theme.typography.fontSize.base,
+            fontWeight: theme.typography.fontWeight.semibold,
+            color: theme.colors.text.inverse,
+            cursor: 'pointer',
+          }}
+        >
+          Finalizar Ronda
         </button>
       </div>
     </div>

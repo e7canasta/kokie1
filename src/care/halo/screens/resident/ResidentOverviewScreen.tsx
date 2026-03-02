@@ -5,6 +5,8 @@ import { useResidentNavigation } from "../../hooks/useResidentNavigation";
 import { useSwipeGesture } from "../../hooks/useSwipeGesture";
 import { useConfirmVisit, useAddNote, useEscalateAlert } from "../../hooks/useActions";
 import { useToggleFavorite } from "../../hooks/useToggleFavorite";
+import { useRounding } from "../../context/RoundingContext";
+import { useRoomVisitSummary, useConfirmRoomVisit, useMarkActivityCompleted } from "../../hooks/useRoomVisitSummary";
 import { ResidentHeader } from "./ResidentHeader";
 import { ViewRoomButton } from "./ViewRoomButton";
 import { WellnessCard } from "../../components/residents/WellnessCard/WellnessCard";
@@ -16,6 +18,7 @@ import { QuickActionBar } from "../../components/ui/QuickActionBar";
 import { BottomSheet } from "../../components/ui/BottomSheet";
 import { NoteForm } from "../../components/forms/NoteForm";
 import { EscalateForm } from "../../components/forms/EscalateForm";
+import { PostRoomSummarySheet } from "../../components/rounding/PostRoomSummarySheet";
 import { theme } from "../../design-system";
 
 export default function ResidentOverviewScreen() {
@@ -25,6 +28,17 @@ export default function ResidentOverviewScreen() {
     // Bottom sheet states
     const [noteSheetOpen, setNoteSheetOpen] = useState(false);
     const [escalateSheetOpen, setEscalateSheetOpen] = useState(false);
+    const [postRoomSummaryOpen, setPostRoomSummaryOpen] = useState(false);
+
+    // Rounding context
+    const { state: roundingState } = useRounding();
+
+    // Room visit summary (Sprint 3 - Post-room summary)
+    const { data: roomVisitSummary } = useRoomVisitSummary(
+        postRoomSummaryOpen && resident?.room ? resident.room : null
+    );
+    const confirmRoomVisitMutation = useConfirmRoomVisit();
+    const markActivityMutation = useMarkActivityCompleted();
 
     // Sprint 1 (P0) - Quick Actions mutations
     const confirmVisitMutation = useConfirmVisit();
@@ -56,8 +70,15 @@ export default function ResidentOverviewScreen() {
     const handleConfirmVisit = async (): Promise<void> => {
         if (!resident) return;
 
-        await confirmVisitMutation.mutateAsync(resident.id);
-        // Auto-advance if in rounding mode (future: check RoundingContext)
+        await confirmVisitMutation.mutateAsync({
+            residentId: resident.id,
+            roomId: resident.room || '',
+        });
+
+        // Si hay ronda activa, mostrar PostRoomSummarySheet
+        if (roundingState.isActive) {
+            setPostRoomSummaryOpen(true);
+        }
     };
 
     const handleNote = (): void => {
@@ -90,6 +111,30 @@ export default function ResidentOverviewScreen() {
         });
 
         setEscalateSheetOpen(false);
+    };
+
+    const handleCompleteAndNext = async (): Promise<void> => {
+        if (!resident?.room) return;
+
+        // Confirmar visita completada
+        await confirmRoomVisitMutation.mutateAsync({
+            roomId: resident.room,
+        });
+
+        // Cerrar sheet
+        setPostRoomSummaryOpen(false);
+
+        // TODO Sprint 5: Auto-advance to next room
+        // navigate(`/resident/${nextResidentId}`);
+    };
+
+    const handleMarkActivityCompleted = async (activityId: string): Promise<void> => {
+        if (!resident?.room) return;
+
+        await markActivityMutation.mutateAsync({
+            roomId: resident.room,
+            activityId,
+        });
     };
 
     if (isLoading) {
@@ -237,6 +282,27 @@ export default function ResidentOverviewScreen() {
                     isLoading={escalateAlertMutation.isPending}
                 />
             </BottomSheet>
+
+            {/* Post-Room Summary Bottom Sheet (Sprint 3) */}
+            {roomVisitSummary && (
+                <BottomSheet
+                    isOpen={postRoomSummaryOpen}
+                    onClose={() => setPostRoomSummaryOpen(false)}
+                    height="auto"
+                    title=""
+                >
+                    <PostRoomSummarySheet
+                        summary={roomVisitSummary}
+                        onAddNote={() => {
+                            setPostRoomSummaryOpen(false);
+                            setNoteSheetOpen(true);
+                        }}
+                        onMarkCompleted={handleMarkActivityCompleted}
+                        onCompleteAndNext={handleCompleteAndNext}
+                        onCancel={() => setPostRoomSummaryOpen(false)}
+                    />
+                </BottomSheet>
+            )}
         </ScreenLayout>
     );
 }

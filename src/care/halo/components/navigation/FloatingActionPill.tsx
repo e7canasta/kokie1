@@ -54,11 +54,23 @@ const ACTION_CONFIG: Record<FabAction, ActionConfig> = {
 interface FloatingActionPillProps {
   action?: FabAction;
   onPress?: () => void;
+  // Progress props para continue-rounding
+  visited?: number;
+  total?: number;
+  percentage?: number;
 }
 
-export function FloatingActionPill({ action = "rounding", onPress }: FloatingActionPillProps) {
+export function FloatingActionPill({
+  action = "rounding",
+  onPress,
+  visited = 0,
+  total = 0,
+  percentage = 0,
+}: FloatingActionPillProps) {
   const [isPressed, setIsPressed] = useState(false);
   const config = ACTION_CONFIG[action];
+
+  const showProgress = action === "continue-rounding" && total > 0;
 
   return (
     <div
@@ -77,9 +89,10 @@ export function FloatingActionPill({ action = "rounding", onPress }: FloatingAct
         style={{
           width: "100%",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 8,
+          gap: showProgress ? 6 : 0,
           padding: "14px 24px",
           background: config.gradient,
           border: "none",
@@ -94,8 +107,39 @@ export function FloatingActionPill({ action = "rounding", onPress }: FloatingAct
           transition: "transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease",
         }}
       >
-        {config.icon}
-        {config.label}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {config.icon}
+          {config.label}
+        </div>
+
+        {showProgress && (
+          <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{
+              fontSize: theme.typography.fontSize.xs,
+              fontWeight: theme.typography.fontWeight.medium,
+              opacity: 0.9,
+            }}>
+              {visited}/{total} completadas • {percentage}%
+            </div>
+
+            {/* Progress bar */}
+            <div style={{
+              width: "100%",
+              height: 4,
+              background: "rgba(255,255,255,0.3)",
+              borderRadius: theme.borderRadius.full,
+              overflow: "hidden",
+            }}>
+              <div style={{
+                width: `${percentage}%`,
+                height: "100%",
+                background: "rgba(255,255,255,0.9)",
+                borderRadius: theme.borderRadius.full,
+                transition: "width 0.3s ease",
+              }} />
+            </div>
+          </div>
+        )}
       </button>
     </div>
   );

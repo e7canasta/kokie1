@@ -1,14 +1,15 @@
 /**
- * HotResidentsSlider Component
+ * TriageQueue Component
  *
- * Sprint 2 (P1) - Generative/contextual slider showing "hot" residents:
- * - NOT static favorites
- * - Dynamic based on: alerts, next in round, recent changes, assigned priority
- * - Ordered by triageScore (descending)
+ * 100% generativo - Cola de triage mostrando residentes que requieren atención:
+ * - Generado automáticamente por el sistema
+ * - NO selección manual (eso es Favoritos, componente separado)
+ * - Basado en: alertas, overdue, trending down, siguiente en ronda
+ * - Ordenado por severidad/prioridad
  *
- * Difference with Rooms:
- * - Rooms = Static planogram with active data
- * - Hot Residents = Generative view based on current context
+ * Diferencia con Rooms:
+ * - Rooms = Vista espacial con planogram
+ * - TriageQueue = Vista por prioridad/urgencia
  */
 
 import { useState } from "react";
@@ -23,12 +24,12 @@ const WELLNESS_RING: Record<string, string> = {
   Low: theme.colors.error,
 };
 
-interface HotResidentsSliderProps {
+interface TriageQueueProps {
   residents: Resident[];
   onResidentClick: (id: number) => void;
 }
 
-export function HotResidentsSlider({ residents, onResidentClick }: HotResidentsSliderProps) {
+export function TriageQueue({ residents, onResidentClick }: TriageQueueProps) {
   if (residents.length === 0) return null;
 
   return (
@@ -46,7 +47,7 @@ export function HotResidentsSlider({ residents, onResidentClick }: HotResidentsS
       }}
     >
       {residents.map((resident, i) => (
-        <HotResidentCard
+        <TriageResidentCard
           key={resident.id}
           resident={resident}
           onClick={() => onResidentClick(resident.id)}
@@ -61,13 +62,13 @@ export function HotResidentsSlider({ residents, onResidentClick }: HotResidentsS
   );
 }
 
-interface HotResidentCardProps {
+interface TriageResidentCardProps {
   resident: Resident;
   onClick: () => void;
   index: number;
 }
 
-function HotResidentCard({ resident, onClick, index }: HotResidentCardProps) {
+function TriageResidentCard({ resident, onClick, index }: TriageResidentCardProps) {
   const [isPressed, setIsPressed] = useState(false);
   const trend = resident.wellness?.trend ?? "Medium";
   const ringColor = WELLNESS_RING[trend] ?? theme.colors.neutral[400];

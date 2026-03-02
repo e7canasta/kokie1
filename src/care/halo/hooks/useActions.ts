@@ -1,18 +1,26 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { actionsApi } from '../services/api/actions.api';
 import { haptics } from '../utils/haptics';
+import { useRounding } from '../context/RoundingContext';
 
 /**
  * Hook para confirmar visita manual
  */
 export function useConfirmVisit() {
   const queryClient = useQueryClient();
+  const { state: roundingState, markRoomVisited } = useRounding();
 
   return useMutation({
-    mutationFn: (residentId: number) => actionsApi.confirmVisit(residentId),
-    onSuccess: (data) => {
+    mutationFn: ({ residentId, roomId }: { residentId: number; roomId: string }) =>
+      actionsApi.confirmVisit(residentId),
+    onSuccess: (data, variables) => {
       // Haptic feedback
       haptics.success();
+
+      // Si hay ronda activa, marcar room como visitada
+      if (roundingState.isActive && variables.roomId) {
+        markRoomVisited(variables.roomId);
+      }
 
       // Invalidate queries para refrescar data
       queryClient.invalidateQueries({ queryKey: ['residents'] });
@@ -90,11 +98,18 @@ export function useEscalateAlert() {
  */
 export function useBulkConfirm() {
   const queryClient = useQueryClient();
+  const { state: roundingState, markRoomVisited } = useRounding();
 
   return useMutation({
     mutationFn: (roomId: string) => actionsApi.confirmBulkVisit(roomId),
-    onSuccess: (data) => {
+    onSuccess: (data, roomId) => {
       haptics.success(); // Success vibration para bulk confirm
+
+      // Si hay ronda activa, marcar room como visitada
+      if (roundingState.isActive) {
+        markRoomVisited(roomId);
+      }
+
       queryClient.invalidateQueries({ queryKey: ['residents'] });
       console.log('[Bulk Visit Confirmed]', data.message, `(${data.count} residents)`);
     },

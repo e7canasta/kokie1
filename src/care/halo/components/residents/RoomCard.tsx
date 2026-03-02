@@ -33,9 +33,11 @@ function getRoomSeverity(residents: Resident[]): RoomSeverity {
 interface RoomCardProps {
   group: RoomGroup;
   onResidentClick: (id: number) => void;
+  isNext?: boolean; // Sprint 4: Badge "SIGUIENTE" durante ronda activa
+  isVirtualEligible?: boolean; // Sprint 4: Badge "VIRTUAL" si puede ser visitada virtualmente
 }
 
-export function RoomCard({ group, onResidentClick }: RoomCardProps) {
+export function RoomCard({ group, onResidentClick, isNext = false, isVirtualEligible = false }: RoomCardProps) {
   const navigate = useNavigate();
   const severity = getRoomSeverity(group.residents);
   const hasAlert = severity === "alert";
@@ -173,7 +175,46 @@ export function RoomCard({ group, onResidentClick }: RoomCardProps) {
           </span>
         )}
 
-        {isOverdue && lowCount === 0 && (
+        {isNext && (
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: theme.typography.fontWeight.bold,
+              color: theme.colors.primary[600],
+              background: `${theme.colors.primary[100]}`,
+              padding: "2px 6px",
+              borderRadius: theme.borderRadius.sm,
+              letterSpacing: "0.03em",
+            }}
+          >
+            SIGUIENTE
+          </span>
+        )}
+
+        {isVirtualEligible && !isNext && lowCount === 0 && (
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: theme.typography.fontWeight.bold,
+              color: theme.colors.primary[600],
+              background: `${theme.colors.primary[100]}`,
+              padding: "2px 6px",
+              borderRadius: theme.borderRadius.sm,
+              letterSpacing: "0.03em",
+              display: "flex",
+              alignItems: "center",
+              gap: 3,
+            }}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            VIRTUAL
+          </span>
+        )}
+
+        {isOverdue && lowCount === 0 && !isNext && (
           <span
             style={{
               fontSize: 9,
