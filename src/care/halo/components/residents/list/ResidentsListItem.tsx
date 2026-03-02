@@ -1,7 +1,8 @@
-import {StarFilledIcon} from "../../../icons/StarFilledIcon.jsx";
-import {StarOutline} from "../../../icons/StarOutlineIcon.jsx";
+import {StarFilledIcon} from "../../../icons/StarFilledIcon";
+import {StarOutline} from "../../../icons/StarOutlineIcon";
+import type { ResidentsListItemProps } from "../../../types/resident.types";
 
-export function ResidentsListItem(props) {
+export function ResidentsListItem(props: ResidentsListItemProps) {
     const totalResidents = props.totalResidents || 0;
     return <div>
         <div style={{

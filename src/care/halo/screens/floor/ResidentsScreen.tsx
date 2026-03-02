@@ -2,18 +2,19 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import {SearchBar} from "../../components/ui/SearchBar.jsx";
-import {MyResidentsSectionTitle} from "../../components/ui/titles/MyResidentsSectionTitle.jsx";
-import {RoundingButton} from "../../components/ui/RoundingButton.jsx";
-import {ResidentsGrid} from "../../components/residents/grid/ResidentsGrid.jsx";
-import {ResidentCard} from "../../components/residents/grid/ResidentCard.jsx";
-import {AllResidentsSectionTitle} from "../../components/ui/titles/AllResidentsSectionTitle.jsx";
-import {ResidentsList} from "../../components/residents/list/ResidentsList.jsx";
-import {ResidentsListItem} from "../../components/residents/list/ResidentsListItem.jsx";
-import {BottomNavigation} from "../../components/navigation/BottomNavigation.jsx";
-import {HomeIndicator} from "../../components/navigation/HomeIndicator.jsx";
+import {SearchBar} from "../../components/ui/SearchBar";
+import {MyResidentsSectionTitle} from "../../components/ui/titles/MyResidentsSectionTitle";
+import {RoundingButton} from "../../components/ui/RoundingButton";
+import {ResidentsGrid} from "../../components/residents/grid/ResidentsGrid";
+import {ResidentCard} from "../../components/residents/grid/ResidentCard";
+import {AllResidentsSectionTitle} from "../../components/ui/titles/AllResidentsSectionTitle";
+import {ResidentsList} from "../../components/residents/list/ResidentsList";
+import {ResidentsListItem} from "../../components/residents/list/ResidentsListItem";
+import {BottomNavigation} from "../../components/navigation/BottomNavigation";
+import {HomeIndicator} from "../../components/navigation/HomeIndicator";
+import type { Resident } from "../../types/resident.types";
 
-const fetchResidents = async () => {
+const fetchResidents = async (): Promise<Resident[]> => {
   const res = await fetch("/api/residents");
   if (!res.ok) throw new Error("Failed to fetch residents");
   return res.json();
@@ -33,15 +34,16 @@ export default function ResidentsScreen() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const { data: residents = [], isLoading, error } = useQuery({
+  const { data: residents = [], isLoading, error } = useQuery<Resident[]>({
     queryKey: ["residents"],
     queryFn: fetchResidents,
   });
   
-  const filteredResidents = residents.filter((r: { name: string }) =>
+  const filteredResidents: Resident[] = residents.filter((r) =>
       r.name.toLowerCase().includes(search.toLowerCase())
   );
-  const handleResidentClick = (id: number) => {
+  
+  const handleResidentClick = (id: number): void => {
     navigate(`/resident/${id}`);
   };
 
@@ -74,13 +76,13 @@ export default function ResidentsScreen() {
           {!isLoading && !error && (
             <>
               <ResidentsGrid 
-                residents={filteredResidents.slice(0, 4).map((r: any) => ({
+                residents={filteredResidents.slice(0, 4).map((r): Resident => ({
                   ...r,
                   colors: r.avatarGradient 
                     ? extractColorsFromGradient(r.avatarGradient)
                     : ["#8B4A5E", "#A0586A", "#D4A0B0"]
                 }))}
-                callbackfn={(resident: { id: number; name: string; room: string; image: string }) => (
+                callbackfn={(resident: Resident) => (
                   <div key={resident.id} onClick={() => handleResidentClick(resident.id)} style={{ cursor: "pointer" }}>
                     <ResidentCard resident={resident} />
                   </div>
@@ -89,11 +91,11 @@ export default function ResidentsScreen() {
 
               <AllResidentsSectionTitle />
               <ResidentsList 
-                residents={filteredResidents.map((r: any) => ({
+                residents={filteredResidents.map((r): Resident => ({
                   ...r,
                   starred: r.starred || false
                 }))}
-                prop={(resident: { id: number; name: string; room: string; age: number; image: string }, i: number) => (
+                prop={(resident: Resident, i: number) => (
                   <div key={resident.id} onClick={() => handleResidentClick(resident.id)} style={{ cursor: "pointer" }}>
                     <ResidentsListItem resident={resident} i={i} totalResidents={filteredResidents.length} />
                   </div>

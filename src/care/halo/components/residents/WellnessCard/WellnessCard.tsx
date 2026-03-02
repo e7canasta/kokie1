@@ -1,6 +1,11 @@
-import {UpArrowIcon} from "../../../icons/UpArrowIcon.jsx";
+import {UpArrowIcon} from "../../../icons/UpArrowIcon";
+import type { WellnessCardProps, WellnessDataItem } from "../../../types/resident.types";
 
-export function WellnessCard({data}) {
+export function WellnessCard({data}: WellnessCardProps) {
+    // Debug: verificar datos recibidos
+    console.log("WellnessCard data:", data);
+    console.log("WellnessCard items:", data.items);
+    
     return (
         <div style={{
             margin: "0 20px",
@@ -13,14 +18,22 @@ export function WellnessCard({data}) {
 
             <div style={{height: 1, background: "#ECECEC", margin: "0 16px"}}/>
 
-            {data.items.map((item, i) => (
-                <WellnessRow key={i} item={item} isLast={i === data.items.length - 1}/>
-            ))}
+            {data.items.map((item, i) => {
+                console.log(`Item ${i}:`, item);
+                return (
+                    <WellnessRow key={i} item={item} isLast={i === data.items.length - 1}/>
+                );
+            })}
         </div>
     );
 }
 
-function WellnessHeader({trend, previousTrend}) {
+interface WellnessHeaderProps {
+    trend?: "Low" | "Medium" | "High";
+    previousTrend?: "Low" | "Medium" | "High";
+}
+
+function WellnessHeader({trend, previousTrend}: WellnessHeaderProps) {
     return (
         <div style={{
             display: "grid",
@@ -41,14 +54,22 @@ function WellnessHeader({trend, previousTrend}) {
                 </span>
             </div>
             <div style={{textAlign: "right"}}>
-                <span style={{fontSize: 11, color: "#999", display: "block", lineHeight: 1.2}}>Last 7 day avg</span>
+                <span style={{fontSize: 11, color: "#999", display: "block", lineHeight: 1.2}}>Last 30 days</span>
                 <span style={{fontSize: 15, fontWeight: 600, color: "#333", display: "block", marginTop: 2}}>{previousTrend}</span>
             </div>
         </div>
     );
 }
 
-function WellnessRow({item, isLast}) {
+interface WellnessRowProps {
+    item: WellnessDataItem;
+    isLast: boolean;
+}
+
+function WellnessRow({item, isLast}: WellnessRowProps) {
+    // Asegurar que siempre tengamos un valor para previous
+    const previousValue = item.previous ?? item.value ?? "-";
+    
     return (
         <div>
             <div style={{
@@ -60,9 +81,9 @@ function WellnessRow({item, isLast}) {
                 <span style={{fontSize: 14, fontWeight: 600, color: "#333"}}>{item.label}</span>
                 <span style={{display: "flex", alignItems: "center", justifyContent: "center", gap: 4}}>
                     {item.hasArrow && <UpArrowIcon/>}
-                    <span style={{fontSize: 14, color: "#333"}}>{item.current}</span>
+                    <span style={{fontSize: 14, color: "#333"}}>{item.current || item.value || "-"}</span>
                 </span>
-                <span style={{fontSize: 14, color: "#333", textAlign: "right"}}>{item.previous}</span>
+                <span style={{fontSize: 14, color: "#333", textAlign: "right"}}>{previousValue}</span>
             </div>
             {!isLast && <div style={{height: 1, background: "#ECECEC", margin: "0 16px"}}/>}
         </div>

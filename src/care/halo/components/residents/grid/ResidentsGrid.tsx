@@ -1,4 +1,6 @@
-export function ResidentsGrid(props) {
+import type { ResidentsGridProps } from "../../../types/resident.types";
+
+export function ResidentsGrid(props: ResidentsGridProps) {
     const residents = props.residents || [];
     return <>
         {/* My Residents Grid - 2x2 */}

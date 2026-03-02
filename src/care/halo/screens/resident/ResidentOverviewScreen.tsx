@@ -1,32 +1,42 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import {ResidentHeader} from "./ResidentHeader.jsx";
-import {ViewRoomButton} from "./ViewRoomButton.jsx";
-import {WellnessCard} from "../../components/residents/WellnessCard/WellnessCard.jsx";
-import {TopCareCard} from "../../components/residents/TopCareCard/TopCareCard.jsx";
+import {ResidentHeader} from "./ResidentHeader";
+import {ViewRoomButton} from "./ViewRoomButton";
+import {WellnessCard} from "../../components/residents/WellnessCard/WellnessCard";
+import {TopCareCard} from "../../components/residents/TopCareCard/TopCareCard";
+import type { Resident } from "../../types/resident.types";
 
 export default function ResidentOverviewScreen() {
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    const residentId = id || "";
+    const residentId: string = id || "";
 
-    const { data: resident, isLoading, error } = useQuery({
+    const { data: resident, isLoading, error } = useQuery<Resident>({
         queryKey: ["resident", residentId],
-        queryFn: async () => {
-            if (!residentId || residentId === "undefined") throw new Error("No resident ID");
+        queryFn: async (): Promise<Resident> => {
+            if (!residentId || residentId === "undefined") {
+                throw new Error("No resident ID");
+            }
             const res = await fetch(`/api/residents/${residentId}`);
-            if (!res.ok) throw new Error("Failed to fetch resident");
-            return res.json();
+            if (!res.ok) {
+                throw new Error("Failed to fetch resident");
+            }
+            const data = await res.json();
+            console.log("Fetched resident data:", data);
+            console.log("WellnessData:", data.wellnessData);
+            return data;
         },
         enabled: Boolean(residentId) && residentId !== "undefined",
+        staleTime: 0, // Forzar refetch siempre
+        cacheTime: 0, // No cachear
     });
 
-    const handleBack = () => {
+    const handleBack = (): void => {
         navigate("/");
     };
 
-    const handleViewRoom = () => {
+    const handleViewRoom = (): void => {
         console.log("Navigate to room");
     };
 

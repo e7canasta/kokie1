@@ -1,6 +1,7 @@
-import {ExternalLinkIcon2} from "../../icons/ExternalLinkIcon2.jsx";
+import {ExternalLinkIcon2} from "../../icons/ExternalLinkIcon2";
+import type { ViewRoomButtonProps } from "../../types/resident.types";
 
-export function ViewRoomButton({onClick}) {
+export function ViewRoomButton({onClick}: ViewRoomButtonProps) {
     return (
         <button
             onClick={onClick}

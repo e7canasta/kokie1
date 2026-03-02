@@ -1,5 +1,7 @@
+import type { AvatarProps } from "../../types/resident.types";
+
 // Avatar component with unique colors per person
-export const Avatar = ({name, size = 42, colors}) => {
+export const Avatar = ({name, size = 42, colors}: AvatarProps) => {
     const initials = name.split(" ").map(n => n[0]).join("");
     return (
         <div style={{

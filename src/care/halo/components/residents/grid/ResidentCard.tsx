@@ -1,8 +1,8 @@
-import {Avatar} from "../../ui/Avatar.jsx";
+import {Avatar} from "../../ui/Avatar";
+import type { ResidentCardProps } from "../../../types/resident.types";
 
-export function ResidentCard(props) {
+export function ResidentCard(props: ResidentCardProps) {
     return <div
-
         style={{
             display: "flex",
             alignItems: "center",

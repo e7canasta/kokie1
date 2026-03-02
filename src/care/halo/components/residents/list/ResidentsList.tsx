@@ -1,4 +1,6 @@
-export function ResidentsList(props) {
+import type { ResidentsListProps } from "../../../types/resident.types";
+
+export function ResidentsList(props: ResidentsListProps) {
     const residents = props.residents || [];
     return <>
         {/* All Residents List */}

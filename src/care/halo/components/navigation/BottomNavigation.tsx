@@ -1,8 +1,8 @@
-import {HomeIcon} from "../../icons/HomeIcon.jsx";
-import {SearchNavIcon} from "../../icons/SearchNavIcon.jsx";
-import {ResidentsNavIcon} from "../../icons/ResidentsNavIcon.jsx";
-import {MenuNavIcon} from "../../icons/MenuNavIcon.jsx";
-import {EditIcon} from "../../icons/EditIcon.jsx";
+import {HomeIcon} from "../../icons/HomeIcon";
+import {SearchNavIcon} from "../../icons/SearchNavIcon";
+import {ResidentsNavIcon} from "../../icons/ResidentsNavIcon";
+import {MenuNavIcon} from "../../icons/MenuNavIcon";
+import {EditIcon} from "../../icons/EditIcon";
 
 export function BottomNavigation() {
     return <>

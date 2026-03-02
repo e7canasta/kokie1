@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ResidentsScreen from './care/halo/screens/floor/ResidentsScreen';
 import ResidentOverviewScreen from './care/halo/screens/resident/ResidentOverviewScreen';
+import CareActivitiesScreen from './care/halo/screens/resident/CareActivitiesScreen';
 
 const queryClient = new QueryClient();
 
@@ -12,6 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<ResidentsScreen />} />
           <Route path="/resident/:id" element={<ResidentOverviewScreen />} />
+          <Route path="/resident/:id/care-activities" element={<CareActivitiesScreen />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

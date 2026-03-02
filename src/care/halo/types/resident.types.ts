@@ -6,8 +6,12 @@ export interface Wellness {
 
 export interface WellnessDataItem {
   label: string;
-  value: string;
-  icon: string;
+  value?: string;
+  icon?: string;
+  // Campos que el componente WellnessCard espera
+  current?: string;
+  previous?: string;
+  hasArrow?: boolean;
 }
 
 export interface TopCareItem {
@@ -68,4 +72,42 @@ export interface WellnessCardData {
 
 export interface WellnessCardProps {
   data: WellnessCardData;
+}
+
+// Tipos para componentes UI
+export interface SearchBarProps {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+export interface AvatarProps {
+  name: string;
+  size?: number;
+  colors: string[];
+}
+
+export interface ViewRoomButtonProps {
+  onClick: () => void;
+}
+
+// Tipos para domain/overview
+export interface CareActivity {
+  activity: string;
+  initiated: string;
+  uninitiated: string;
+  total: string;
+}
+
+export type TimeRangeTab = "Last 24h" | "Last 7 Days" | "Last 30 Days";
+
+// Tipos para TopCareCard
+export interface TimeRangeTabsProps {
+  tabs: TimeRangeTab[];
+  activeTab: TimeRangeTab;
+  onTabChange: (tab: TimeRangeTab) => void;
+}
+
+export interface ActivityRowProps {
+  item: CareActivity;
+  isLast: boolean;
 }

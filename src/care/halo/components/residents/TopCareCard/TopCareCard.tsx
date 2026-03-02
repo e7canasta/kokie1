@@ -1,8 +1,17 @@
-import {useState} from "react";
-import {careActivities, timeRangeTabs} from "../../../domain/overview.js";
+import {useState, useMemo} from "react";
+import {useParams, useNavigate} from "react-router-dom";
+import {careActivitiesByTimeRange, timeRangeTabs} from "../../../domain/overview";
+import type { CareActivity, TimeRangeTab, TimeRangeTabsProps, ActivityRowProps } from "../../../types/resident.types";
 
 export function TopCareCard() {
-    const [activeTab, setActiveTab] = useState(timeRangeTabs[0]);
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState<TimeRangeTab>(timeRangeTabs[0]);
+
+    // Obtener actividades según el tab activo
+    const currentActivities = useMemo(() => {
+        return careActivitiesByTimeRange[activeTab];
+    }, [activeTab]);
 
     return (
         <div style={{padding: "24px 20px 0"}}>
@@ -19,26 +28,30 @@ export function TopCareCard() {
 
             <div style={{height: 1, background: "#ECECEC"}}/>
 
-            {careActivities.map((item, i) => (
-                <ActivityRow key={i} item={item} isLast={i === careActivities.length - 1}/>
+            {currentActivities.map((item, i) => (
+                <ActivityRow key={`${item.activity}-${i}`} item={item} isLast={i === currentActivities.length - 1}/>
             ))}
 
-            <button style={{
-                background: "none",
-                border: "none",
-                color: "#2E7D6F",
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: "pointer",
-                padding: "14px 0 20px",
-            }}>
+            <button 
+                onClick={() => navigate(`/resident/${id}/care-activities`)}
+                style={{
+                    background: "none",
+                    border: "none",
+                    color: "#2E7D6F",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    padding: "14px 0 20px",
+                    width: "100%",
+                }}
+            >
                 View More
             </button>
         </div>
     );
 }
 
-function TimeRangeTabs({tabs, activeTab, onTabChange}) {
+function TimeRangeTabs({tabs, activeTab, onTabChange}: TimeRangeTabsProps) {
     return (
         <div style={{
             display: "flex",
@@ -87,7 +100,7 @@ function TableHeader() {
     );
 }
 
-function ActivityRow({item, isLast}) {
+function ActivityRow({item, isLast}: ActivityRowProps) {
     return (
         <div>
             <div style={{

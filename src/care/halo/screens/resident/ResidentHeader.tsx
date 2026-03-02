@@ -1,7 +1,8 @@
-import {ChevronLeftIcon} from "../../icons/ChevronLeftIcon.jsx";
-import {StarIcon} from "../../icons/StarIcon.jsx";
+import {ChevronLeftIcon} from "../../icons/ChevronLeftIcon";
+import {StarIcon} from "../../icons/StarIcon";
+import type { ResidentHeaderProps } from "../../types/resident.types";
 
-export function ResidentHeader({resident, onBack}) {
+export function ResidentHeader({resident, onBack}: ResidentHeaderProps) {
     return (
         <div style={{
             display: "flex",
@@ -56,7 +57,12 @@ export function ResidentHeader({resident, onBack}) {
     );
 }
 
-function Avatar({avatarGradient, showBadge}) {
+interface AvatarProps {
+    avatarGradient: string;
+    showBadge: boolean;
+}
+
+function Avatar({avatarGradient, showBadge}: AvatarProps) {
     return (
         <div style={{
             width: 60,

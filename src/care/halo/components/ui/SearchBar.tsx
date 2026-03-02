@@ -1,6 +1,7 @@
-import {SearchIcon} from "../../icons/SearchIcon.jsx";
+import {SearchIcon} from "../../icons/SearchIcon";
+import type { SearchBarProps } from "../../types/resident.types";
 
-export function SearchBar(props) {
+export function SearchBar(props: SearchBarProps) {
     return <>
         {/* Search Bar */}
         <div style={{padding: "8px 16px 10px"}}>

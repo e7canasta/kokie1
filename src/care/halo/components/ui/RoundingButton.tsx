@@ -1,4 +1,4 @@
-import {ExternalLinkIcon} from "../../icons/ExternalLinkIcon.jsx";
+import {ExternalLinkIcon} from "../../icons/ExternalLinkIcon";
 
 export function RoundingButton() {
     return <>
